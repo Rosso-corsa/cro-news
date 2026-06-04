@@ -1,0 +1,738 @@
+[
+  {
+    "summary": "U teškoj pomorskoj nesreći kod pulskog lukobrana jedna je osoba poginula, a druga je teško ozlijeđena nakon udarca brodice u lukobran. Ozlijeđeni austrijski državljanin nalazi se u pulskoj bolnici u životnoj opasnosti.",
+    "entities": [
+      "Andrej Angelini",
+      "Davor Romić",
+      "Lučka kapetanija Pula",
+      "Opća bolnica Pula"
+    ],
+    "topics": [
+      "pomorska nesreća",
+      "istraga",
+      "bolnica"
+    ],
+    "id": "1"
+  },
+  {
+    "summary": "U padu manjeg zrakoplova registriranog u Njemačkoj kod Medulina poginule su četiri osobe, uključujući dvojicu austrijskih pilota. Agencija za istraživanje nesreća otvorila je službenu istragu kako bi se utvrdile okolnosti nesreće.",
+    "entities": [
+      "Alana Vukić",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Nijaz Delić",
+      "Medulin",
+      "Austrija"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "istraga",
+      "poginuli"
+    ],
+    "id": "2"
+  },
+  {
+    "summary": "Premijer Andrej Plenković sastao se s Hrvatima u Crnoj Gori i najavio da će Vlada osigurati proračunska sredstva za obnovu Doma kulture u Donjoj Lastvi. Tom prigodom potpisan je i ugovor o nastavku potpore manjinskom Radiju Dux.",
+    "entities": [
+      "Andrej Plenković",
+      "Gordan Grlić Radman",
+      "Adrijan Vuksanović",
+      "Crna Gora",
+      "Hrvatska"
+    ],
+    "topics": [
+      "politika",
+      "hrvatska manjina",
+      "obnova",
+      "potpora"
+    ],
+    "id": "3"
+  },
+  {
+    "summary": "Europska komisija uputila je Hrvatskoj dvije službene opomene zbog nepravilnog prenošenja direktive o unajmljenim vozilima za prijevoz tereta i neprovođenja pravila o sankcijama iz uredbe ReFuelEU Aviation. Hrvatska ima rok od dva mjeseca da odgovori i ispravi navedene nedostatke.",
+    "entities": [
+      "Europska komisija",
+      "Hrvatska",
+      "Belgija",
+      "Rumunjska"
+    ],
+    "topics": [
+      "pravo EU",
+      "promet",
+      "zrakoplovno gorivo",
+      "sankcije"
+    ],
+    "id": "4"
+  },
+  {
+    "summary": "Ministri unutarnjih poslova EU-a odobrili su novi okvir i akcijski plan za borbu protiv trgovine i uporabe droga, pri čemu je Hrvatska zabilježila rekordan broj zapljena. Također se raspravljalo o migracijama, paktu o azilu i mogućem ukidanju privremenih unutarnjih graničnih kontrola u schengenskom prostoru.",
+    "entities": [
+      "Davor Božinović",
+      "Europska unija",
+      "Hrvatska",
+      "Frontex"
+    ],
+    "topics": [
+      "borba protiv droga",
+      "migracije",
+      "schengenski prostor",
+      "policija"
+    ],
+    "id": "5"
+  },
+  {
+    "summary": "Politički ekonomist Željko Ivanković kritizirao je Vladine protuinflacijske mjere kao reaktivne te pozvao na ozbiljnu i strukturiranu javnu raspravu o uzrocima inflacije. Također je komentirao promjenu na čelu HNB-a i utjecaj uvođenja eura.",
+    "entities": [
+      "Željko Ivanković",
+      "Andrej Plenković",
+      "Ante Žigman",
+      "Boris Vujčić",
+      "Hrvatska narodna banka"
+    ],
+    "topics": [
+      "ekonomija",
+      "inflacija",
+      "porezna reforma",
+      "bankarski sektor"
+    ],
+    "id": "6"
+  },
+  {
+    "summary": "Zbog produženog vikenda pojačan je promet na ključnim cestama i graničnim prijelazima u Hrvatskoj, uz kolone na Lučkom u smjeru mora. Hrvatske autoceste upozorile su vozače na privremene prometne regulacije i radove na nekoliko dionica.",
+    "entities": [
+      "Hrvatski autoklub",
+      "Hrvatske autoceste"
+    ],
+    "topics": [
+      "promet",
+      "turizam",
+      "gužve na cestama",
+      "radovi na cesti"
+    ],
+    "id": "7"
+  },
+  {
+    "summary": "Oko 50 tisuća djece u Hrvatskoj nema stalnog pedijatra, a problem je najizraženiji u Šibensko-kninskoj županiji gdje sustav ovisi o umirovljenim liječnicima. Lokalne vlasti nude financijske poticaje i rješavanje stambenog pitanja kako bi privukle mlade specijaliste.",
+    "entities": [
+      "Ante Pelaić",
+      "Ivana Skorić",
+      "Petar Čagalj",
+      "Mario Mašić",
+      "Ministarstvo zdravstva"
+    ],
+    "topics": [
+      "zdravstvo",
+      "pedijatrija",
+      "specijalizacija",
+      "nedostatak liječnika"
+    ],
+    "id": "8"
+  },
+  {
+    "summary": "Riječki nadbiskup Mate Uzinić na misi povodom blagdana Tijelova pozvao je na izgradnju 'crkve mostova, a ne zidova' te istaknuo važnost širenja ljubavi, povjerenja i mira. Nadbiskupija je ujedno obilježila stotu obljetnicu proglašenja Rijeke sjedištem biskupije.",
+    "entities": [
+      "Mate Uzinić",
+      "Riječka nadbiskupija",
+      "Rijeka"
+    ],
+    "topics": [
+      "religija",
+      "Tijelovo",
+      "propovijed",
+      "zajedništvo"
+    ],
+    "id": "9"
+  },
+  {
+    "summary": "Agencija Bruketa&Žinić&Grey ponovno postaje nezavisna agencija u domaćem vlasništvu te nastavlja s radom pod novim imenom Bruketa&. Promjena dolazi nakon otkupa vlasničkih udjela WPP-ove mreže Grey i suosnivača Nikole Žinića.",
+    "entities": [
+      "Davor Bruketa",
+      "Nikola Žinić",
+      "Grey",
+      "WPP",
+      "Bruketa&"
+    ],
+    "topics": [
+      "marketing",
+      "poslovanje",
+      "rebrendiranje",
+      "vlasništvo"
+    ],
+    "id": "10"
+  },
+  {
+    "summary": "Slavonska avenija i podvožnjak kod Vjesnika u Zagrebu bit će potpuno zatvoreni za promet radi sigurnosti tijekom uklanjanja sjevernog dijela Vjesnikova nebodera. Radovi se pomno planiraju uz stroge sigurnosne mjere, a cjelokupni neboder trebao bi biti uklonjen do prve polovine srpnja.",
+    "entities": [
+      "Branko Bačić",
+      "Hrvoje Merki",
+      "Eurco",
+      "Zagreb",
+      "Gark Konzalting"
+    ],
+    "topics": [
+      "građevina",
+      "promet",
+      "regulacija prometa",
+      "rušenje"
+    ],
+    "id": "11"
+  },
+  {
+    "summary": "Saborski zastupnik Nino Raspudić komentirao je inicijativu Domovinskog pokreta o uspostavi hrvatske izborne jedinice u BiH, ustvrdivši da je ona 'istjerala HDZ na čistac'. Smatra da odgovornost za političko stanje u BiH leži na međunarodnoj zajednici koja je problem i stvorila.",
+    "entities": [
+      "Nino Raspudić",
+      "Domovinski pokret",
+      "Hrvatska demokratska zajednica",
+      "Andrej Plenković",
+      "Bosna i Hercegovina"
+    ],
+    "topics": [
+      "politika",
+      "izborni zakon",
+      "Hrvati u BiH",
+      "međunarodna zajednica"
+    ],
+    "id": "12"
+  },
+  {
+    "summary": "Predstavnici hrvatskih i bošnjačkih političkih stranaka raspravljali su u emisiji 'Otvoreno' o inicijativi Domovinskog pokreta za uspostavu hrvatske izborne jedinice u BiH. Dok DP i Raspudić zagovaraju promjene radi sprječavanja preglasavanja Hrvata, bošnjački političar Zahiragić oštro se usprotivio toj ideji.",
+    "entities": [
+      "Mladen Barać",
+      "Frano Matušić",
+      "Haris Zahiragić",
+      "Nino Raspudić",
+      "Bosna i Hercegovina"
+    ],
+    "topics": [
+      "politika",
+      "izborni zakon",
+      "Herceg-Bosna",
+      "konstitutivni narodi"
+    ],
+    "id": "13"
+  },
+  {
+    "summary": "Novi mađarski premijer Péter Magyar predložit će proširenje Višegradske skupine, što bi moglo uključiti i Hrvatsku. Politički analitičar Davor Gjenero upozorava da Zagreb treba pažljivo odvagnuti tu odluku zbog složenih odnosa i geopolitičkih rivalstava.",
+    "entities": [
+      "Péter Magyar",
+      "Davor Gjenero",
+      "Višegradska skupina",
+      "Hrvatska",
+      "Mađarska"
+    ],
+    "topics": [
+      "geopolitika",
+      "međunarodni odnosi",
+      "ekonomska suradnja",
+      "regionalne inicijative"
+    ],
+    "id": "14"
+  },
+  {
+    "summary": "Katolička crkva slavi blagdan Tijelova kojim se obilježava ustanovljenje Euharistije na Posljednjoj večeri. Tekst donosi povijesni pregled nastanka ovog blagdana u 13. stoljeću, uključujući i čuveni euharistijski događaj u Ludbregu iz 1411. godine.",
+    "entities": [
+      "Katolička crkva",
+      "Sveta Julijana",
+      "Ludbreg"
+    ],
+    "topics": [
+      "religija",
+      "Tijelovo",
+      "povijest",
+      "Euharistija"
+    ],
+    "id": "15"
+  },
+  {
+    "summary": "Proslavljeni veslači braća Sinković i brojni građani upozoravaju na loše stanje zagrebačkog jezera Jarun koje je prepuno lopoča i mulja. Gradonačelnik Tomislav Tomašević najavio je pokretanje postupka odmuljivanja u suradnji s Hrvatskim vodama.",
+    "entities": [
+      "Martin Sinković",
+      "Valent Sinković",
+      "Tomislav Tomašević",
+      "Hrvatske vode",
+      "Zagreb"
+    ],
+    "topics": [
+      "sport",
+      "ekologija",
+      "gradska uprava",
+      "rekreacija"
+    ],
+    "id": "16"
+  },
+  {
+    "summary": "Zbog uklanjanja sjevernog dijela Vjesnikova nebodera u Zagrebu, Slavonska avenija i pripadajući podvožnjak bit će potpuno zatvoreni za promet do nedjelje navečer. Nadležni ističu da su sigurnosne mjere na visokoj razini te da se radovi odvijaju prema planu.",
+    "entities": [
+      "Branko Bačić",
+      "Hrvoje Merki",
+      "Eurco",
+      "Zagreb",
+      "Gark Konzalting"
+    ],
+    "topics": [
+      "građevina",
+      "promet",
+      "regulacija prometa",
+      "rušenje"
+    ],
+    "id": "17"
+  },
+  {
+    "summary": "Kratki videoisječak prikazuje neodgovornog vozača koji je na autocesti A1 u smjeru Karlovca vozio slalom i pretjecao vozila koristeći zaustavnu traku.",
+    "entities": [
+      "Hrvatska",
+      "Autocesta A1"
+    ],
+    "topics": [
+      "promet",
+      "sigurnost na cestama",
+      "prekršaj"
+    ],
+    "id": "18"
+  },
+  {
+    "summary": "Klimatolozi i Ujedinjeni narodi upozoravaju na razvoj iznimno snažnog fenomena El Niño u Tihom oceanu, koji bi mogao imati razorne globalne posljedice. Očekuju se suše, poplave, pad poljoprivredne proizvodnje, rast cijena hrane te novi migracijski valovi i politička nestabilnost.",
+    "entities": [
+      "Ujedinjeni narodi",
+      "Svjetska meteorološka organizacija",
+      "Mike Rivington",
+      "Paul Behrens"
+    ],
+    "topics": [
+      "klima",
+      "El Niño",
+      "poljoprivreda",
+      "migracije",
+      "globalno gospodarstvo"
+    ],
+    "id": "19"
+  },
+  {
+    "summary": "Članak donosi uznemirujuću snimku otmice muškarca kod Arene Zagreb, gdje su ga napadači pretukli i ugurali u prtljažnik automobila. Policija je brzo reagirala i uhitila sve četvoricu osumnjičenika, dok je žrtva zbrinuta u bolnici.",
+    "entities": [
+      "KBC Rebro",
+      "Zagreb",
+      "Hrvatska"
+    ],
+    "topics": [
+      "kriminal",
+      "otmica",
+      "policija",
+      "nasilje"
+    ],
+    "id": "20"
+  },
+  {
+    "summary": "U prometnoj nesreći u mjestu Donje Bazije kod Slatine poginuo je vozač nakon što je automobilom sletio s ceste i udario u putni kanal. Cesta je privremeno zatvorena radi provođenja policijskog očevida.",
+    "entities": [
+      "Donje Bazije",
+      "Slatina",
+      "Policijska uprava virovitičko-podravska"
+    ],
+    "topics": [
+      "prometna nesreća",
+      "crna kronika",
+      "policijski očevid"
+    ],
+    "id": "21"
+  },
+  {
+    "summary": "Kratka vijest i fotografije svjedoče o dramatičnoj otmici muškarca usred dana ispred zagrebačkog trgovačkog centra Arena Centar, nakon koje su svi počinitelji uhićeni.",
+    "entities": [
+      "Arena Centar",
+      "Zagreb",
+      "Hrvatska"
+    ],
+    "topics": [
+      "kriminal",
+      "otmica",
+      "policija"
+    ],
+    "id": "22"
+  },
+  {
+    "summary": "Četvorica muškaraca uhitila je zagrebačka policija nakon što su usred dana ispred Arena Centra brutalno pretukli čovjeka i ugurali ga u prtljažnik automobila. Žrtva otmice prevezena je u KBC Rebro, a u tijeku je kriminalističko istraživanje.",
+    "entities": [
+      "Arena Centar",
+      "KBC Rebro",
+      "Zagreb",
+      "Hrvatska"
+    ],
+    "topics": [
+      "kriminal",
+      "otmica",
+      "policijska istraga",
+      "nasilje"
+    ],
+    "id": "23"
+  },
+  {
+    "summary": "Mali zrakoplov srušio se na području Campanoža kod Medulina, a u nesreći su poginule četiri osobe. Prema podacima s radara, zrakoplov je letio iz Austrije za Hrvatsku prije nego što se pod nerazjašnjenim okolnostima srušio blizu aerodroma.",
+    "entities": [
+      "Medulin",
+      "Austrija",
+      "Hrvatska"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "poginuli",
+      "hitne službe"
+    ],
+    "id": "24"
+  },
+  {
+    "summary": "Sjednica Doma naroda Parlamentarne skupštine BiH prekinuta je zbog nedostatka kvoruma nakon oštrih svađa i optužbi među zastupnicima oko dnevnog reda. Na dnevnom redu trebali su biti ključni zakoni o sudu BiH i VSTV-u, koji su uvjet za otvaranje pregovora s Europskom unijom.",
+    "entities": [
+      "Dragan Čović",
+      "Zlatko Miletić",
+      "Kemal Ademović",
+      "Bosna i Hercegovina",
+      "Europska unija"
+    ],
+    "topics": [
+      "politika",
+      "parlament",
+      "izborni zakoni",
+      "europske integracije"
+    ],
+    "id": "25"
+  },
+  {
+    "summary": "Članak prenosi videoisječke s dvaju odvojenih događaja u Hrvatskoj: neodgovorne vožnje slalomom na autocesti A1 te nedavne nasilne otmice muškarca kod zagrebačkog Arena Centra.",
+    "entities": [
+      "Arena Centar",
+      "KBC Rebro",
+      "Zagreb",
+      "Hrvatska"
+    ],
+    "topics": [
+      "kriminal",
+      "otmica",
+      "prometni prekršaj"
+    ],
+    "id": "26"
+  },
+  {
+    "summary": "Ravnateljica istarske Hitne službe izvijestila je o teškoj i potresnoj intervenciji nakon pada manjeg zrakoplova kod Medulina u kojem je poginulo četvero ljudi. Policijski očevid i istragu provode nadležne službe i Agencija za istraživanje nesreća.",
+    "entities": [
+      "Tatjana Maričić",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Medulin",
+      "Pula"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "hitne službe",
+      "istraga"
+    ],
+    "id": "27"
+  },
+  {
+    "summary": "Zapovjednik JVP-a Pula Ivica Rojnić potvrdio je da u padu zrakoplova kod Medulina nema preživjelih te da je postojala opasnost od požara zbog izlijevanja goriva. Očevid je u tijeku, a u istragu je uključena i Agencija za istraživanje nesreća.",
+    "entities": [
+      "Ivica Rojnić",
+      "Javna vatrogasna postrojba Pula",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Medulin"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "vatrogasci",
+      "hitna intervencija"
+    ],
+    "id": "28"
+  },
+  {
+    "summary": "Iskusni pilot i očevidac Nijaz Delić opisao je stravičan pad malog zrakoplova kod Medulina, istaknuvši da se letjelica okomito strmoglavila prema tlu. U nesreći su poginule četiri osobe, a okolnosti nesreće istražuje Agencija za istraživanje nesreća.",
+    "entities": [
+      "Nijaz Delić",
+      "Tatjana Čemerikić",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Medulin",
+      "Austrija"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "očevidac",
+      "istraga",
+      "poginuli"
+    ],
+    "id": "29"
+  },
+  {
+    "summary": "Očekuje se da će se John Bolton, bivši Trumpov savjetnik za nacionalnu sigurnost, izjasniti krivim za nezakonito zadržavanje povjerljivih dokumenata važnih za nacionalnu sigurnost. Bolton je pristao platiti kaznu od preko dva milijuna dolara.",
+    "entities": [
+      "John Bolton",
+      "Donald Trump",
+      "Sjedinjene Američke Države"
+    ],
+    "topics": [
+      "politika",
+      "pravosuđe",
+      "povjerljivi dokumenti",
+      "nacionalna sigurnost"
+    ],
+    "id": "30"
+  },
+  {
+    "summary": "Novi iranski vrhovni vođa Modžtaba Hamenei optužio je Sjedinjene Države i Izrael za pokušaje sijanja razdora i nepovjerenja u iranskom društvu. Njegova pisana izjava pročitana je na svečanosti obilježavanja smrti utemeljitelja Islamske Republike ajatolaha Homeinija.",
+    "entities": [
+      "Modžtaba Hamenei",
+      "Ali Hamenei",
+      "Ruholah Homeiniji",
+      "Sjedinjene Države",
+      "Izrael"
+    ],
+    "topics": [
+      "politika",
+      "geopolitika",
+      "bliskoistočni sukob",
+      "komemoracija"
+    ],
+    "id": "31"
+  },
+  {
+    "summary": "Ravnateljica Agencije za istraživanje nesreća Alana Vukić potvrdila je pokretanje službene istrage o padu zrakoplova kod Medulina u kojem su poginule četiri osobe. Identificirana su dvojica poginulih pilota koji su bili austrijski državljani, dok se za ostale žrtve identitet još utvrđuje.",
+    "entities": [
+      "Alana Vukić",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Medulin"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "istraga",
+      "identifikacija žrtava"
+    ],
+    "id": "32"
+  },
+  {
+    "summary": "Europska komisija uputila je Hrvatskoj dvije službene opomene zbog nepravilnog prenošenja direktive o najmu teretnih vozila i neprovođenja pravila o sankcijama u zrakoplovstvu. Države članice imaju rok od dva mjeseca za uklanjanje nedostataka prije mogućeg slanja obrazloženog mišljenja.",
+    "entities": [
+      "Europska komisija",
+      "Hrvatska",
+      "Belgija",
+      "Slovačka"
+    ],
+    "topics": [
+      "pravo EU",
+      "promet",
+      "održiva zrakoplovna goriva",
+      "zakonodavstvo"
+    ],
+    "id": "33"
+  },
+  {
+    "summary": "Tekst prenosi raniju vijest i snimku o dramatičnoj otmici muškarca ispred zagrebačkog Arena Centra, unatoč različitom naslovu o sukobu u Bruxellesu.",
+    "entities": [
+      "Arena Centar",
+      "Zagreb",
+      "Hrvatska"
+    ],
+    "topics": [
+      "kriminal",
+      "otmica",
+      "policija"
+    ],
+    "id": "34"
+  },
+  {
+    "summary": "Priloženi tekst ponavlja vijest o neodgovornom vozaču koji je vozio po zaustavnoj traci na autocesti A1 u smjeru Karlovca.",
+    "entities": [
+      "Autocesta A1",
+      "Karlovac",
+      "Zagreb"
+    ],
+    "topics": [
+      "promet",
+      "sigurnost na cestama",
+      "prekršaj"
+    ],
+    "id": "35"
+  },
+  {
+    "summary": "U Hrvatskoj su zabilježeni novi strašni slučajevi mučenja životinja u Velikoj Gorici, gdje je štene ostavljeno zavezano na groblju, te u Balama, gdje je mladić izgladnjivao pse do smrti. Udruga Prijatelji životinja upozorava na nefunkcioniranje sustava zaštite životinja i traži zakonske reforme.",
+    "entities": [
+      "Luka Oman",
+      "Prijatelji životinja",
+      "Velika Gorica",
+      "Rovinj",
+      "Bale"
+    ],
+    "topics": [
+      "zaštita životinja",
+      "zlostavljanje",
+      "zakonodavstvo",
+      "aktivizam"
+    ],
+    "id": "36"
+  },
+  {
+    "summary": "Nekoliko radnika je ozlijeđeno u zračnoj luci u Frankfurtu nakon što je na parkiranom zrakoplovu Boeing 787-9 tvrtke Lufthansa neočekivano propao prednji stajni trap. Pokrenuta je istraga o točnim okolnostima ovog incidenta.",
+    "entities": [
+      "Lufthansa",
+      "Frankfurt",
+      "Boeing"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "tehnički kvar",
+      "istraga"
+    ],
+    "id": "37"
+  },
+  {
+    "summary": "Prognoza vremena najavljuje nestabilan petak s kišom, pljuskovima i grmljavinom u većem dijelu Hrvatske zbog prolaska oslabjele fronte. Već od subote očekuje se stabilizacija vremena, porast temperatura i povratak sunčanih razdoblja.",
+    "entities": [
+      "Hrvatska",
+      "Slavonija",
+      "Dalmacija"
+    ],
+    "topics": [
+      "vremenska prognoza",
+      "lipanj",
+      "ljeto",
+      "promjena vremena"
+    ],
+    "id": "38"
+  },
+  {
+    "summary": "Revident Mario Todorić potvrdio je da radovi na uklanjanju sjevernog dijela Vjesnikova nebodera u Zagrebu teku prema planu te da bi cijeli objekt mogao biti srušen i prije roka. Zbog radova je zatvorena Slavonska avenija, no očekuje se normalizacija prometa do ponedjeljka ujutro.",
+    "entities": [
+      "Mario Todorić",
+      "Dina Ćevid",
+      "Zagreb",
+      "Vjesnik"
+    ],
+    "topics": [
+      "građevina",
+      "rušenje",
+      "promet",
+      "regulacija prometa"
+    ],
+    "id": "39"
+  },
+  {
+    "summary": "U teškoj prometnoj nesreći u mjestu Donje Bazije kod Čađavice poginuo je vozač nakon što je automobilom sletio s ceste u putni kanal. Županijska cesta ŽC 4038 privremeno je zatvorena za promet radi obavljanja policijskog očevida.",
+    "entities": [
+      "Donje Bazije",
+      "Čađavica",
+      "Policija"
+    ],
+    "topics": [
+      "prometna nesreća",
+      "crna kronika",
+      "policijski očevid"
+    ],
+    "id": "40"
+  },
+  {
+    "summary": "Hrvatske bolnice, posebice manje regionalne ustanove, suočavaju se s ozbiljnim problemom odlaska mladih liječnika odmah nakon završetka specijalizacije. Liječnička udruženja i komora zalažu se za uvođenje državnih stimulacija umjesto restriktivnih ugovora, dok Ministarstvo najavljuje centralizirano financiranje.",
+    "entities": [
+      "Nikola Prpić",
+      "Sandra Čubelić",
+      "Krešimir Luetić",
+      "Davor Mijatović",
+      "Ministarstvo zdravstva"
+    ],
+    "topics": [
+      "zdravstvo",
+      "specijalizacija",
+      "nedostatak liječnika",
+      "bolnice"
+    ],
+    "id": "41"
+  },
+  {
+    "summary": "Na samitu EU - Zapadni Balkan u crnogorskom Tivtu okupili su se visoki dužnosnici, a srbijanski predsjednik Aleksandar Vučić privukao je najviše pažnje svojim izjavama. Sastanku je nazočio i hrvatski premijer Andrej Plenković, koji se susreo s hrvatskom zajednicom te planira bilateralne razgovore o otvorenim pitanjima.",
+    "entities": [
+      "Aleksandar Vučić",
+      "Andrej Plenković",
+      "Milojko Spajić",
+      "Crna Gora",
+      "Srbija"
+    ],
+    "topics": [
+      "politika",
+      "samit",
+      "europske integracije",
+      "bilateralni odnosi"
+    ],
+    "id": "42"
+  },
+  {
+    "summary": "Nakon javnih kritika u slučaju ročnika kojemu je zbog bolesti pozvana majka, Ministarstvo obrane raspisalo je natječaj za zapošljavanje 14 liječnika na području Hrvatske. Osim liječnika, MORH traži i druge stručnjake poput pravnika, psihologa i kriminalista.",
+    "entities": [
+      "Ministarstvo obrane",
+      "Hrvatska"
+    ],
+    "topics": [
+      "zapošljavanje",
+      "morh",
+      "zdravstvena skrb u vojsci",
+      "javni natječaj"
+    ],
+    "id": "43"
+  },
+  {
+    "summary": "Jedan austrijski državljanin je poginuo, a drugi je teško ozlijeđen nakon što se njihov gliser pri velikoj brzini zabio u pulski lukobran. Ozlijeđeni 30-godišnjak se bori za život u pulskoj bolnici, dok policija i lučka kapetanija istražuju uzroke nesreće.",
+    "entities": [
+      "Andrej Angelini",
+      "Davor Omić",
+      "Opća bolnica Pula",
+      "Lučka kapetanija Pula"
+    ],
+    "topics": [
+      "pomorska nesreća",
+      "istraga",
+      "bolnica"
+    ],
+    "id": "44"
+  },
+  {
+    "summary": "Stručnjak za zrakoplovne nesreće Josip Milošević smatra da je ljudski faktor najvjerojatniji uzrok pada zrakoplova kod Medulina u kojem je poginulo četvero ljudi. Milošević je također kritizirao prelazak na online obuku zrakoplovnog osoblja tijekom pandemije, ističući da to negativno utječe na sigurnost.",
+    "entities": [
+      "Josip Milošević",
+      "Medulin",
+      "Hrvatska"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "sigurnost letenja",
+      "obuka pilota",
+      "analiza"
+    ],
+    "id": "45"
+  },
+  {
+    "summary": "U padu njemačkog zrakoplova koji je letio iz Linza u Austriji prema Medulinu poginula su četvorica muškaraca, uključujući dvojicu austrijskih pilota. Agencija za istraživanje nesreća provodi očevid i u roku od 30 dana objavit će preliminarno izvješće o uzrocima nesreće.",
+    "entities": [
+      "Alana Vukić",
+      "Agencija za istraživanje nesreća u zračnom, pomorskom i željezničkom prometu",
+      "Nijaz Delić",
+      "Medulin",
+      "Austrija"
+    ],
+    "topics": [
+      "zrakoplovna nesreća",
+      "istraga",
+      "hitne službe"
+    ],
+    "id": "46"
+  },
+  {
+    "summary": "Izvjestitelj Europskog parlamenta Tonino Picula izjavio je da je Srbija žarišna točka otpora europskim integracijama na Zapadnom Balkanu te da svoje unutarnje deficite prenosi u susjedstvo. Komentirao je i nedavno protjerivanje skupine muškaraca iz Crne Gore te protu-europsku politiku 'srpskog sveta'.",
+    "entities": [
+      "Tonino Picula",
+      "Aleksandar Vučić",
+      "Milorad Dodik",
+      "Srbija",
+      "Crna Gora"
+    ],
+    "topics": [
+      "politika",
+      "europske integracije",
+      "zapadni balkan",
+      "geopolitika"
+    ],
+    "id": "47"
+  }
+]

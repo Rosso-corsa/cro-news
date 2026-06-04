@@ -1,0 +1,16 @@
+# RSS feed parsing
+feedparser==6.0.10
+python-dateutil==2.8.2
+
+# Article content extraction
+newspaper3k==0.2.8
+lxml-html-clean
+
+# Testing
+pytest==7.4.3
+
+# AI
+google-genai
+
+# Telegram
+python-telegram-bot
