@@ -8,7 +8,7 @@ from src.editor import collect_articles, categorize_articles, group_articles, pr
 
 logging.getLogger().setLevel(logging.INFO)
 
-def handler(event, _):
+def handler():
     collect_articles()
     categorize_articles()
     group_articles()

@@ -1,0 +1,51 @@
+name: Run Handler
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  run-handler:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Create config.json from secrets
+        run: |
+          python -c "
+          import json
+          config = {
+            'rss_feeds': [
+              {'name': 'Index HR', 'url': 'https://www.index.hr/rss/vijesti-hrvatska'},
+              {'name': 'Index HR (Zagreb)', 'url': 'https://www.index.hr/rss/vijesti-zagreb'},
+              {'name': '24sata.hr', 'url': 'https://www.24sata.hr/feeds/news.xml'},
+              {'name': 'Jutarnji.hr', 'url': 'https://politepaul.com/fd/M8RRsFn0lOMp.xml'},
+              {'name': 'Vecernji.hr', 'url': 'https://www.vecernji.hr/feeds/vijesti.xml'},
+              {'name': 'Dnevnik.hr', 'url': 'https://dnevnik.hr/assets/feed/articles'}
+            ],
+            'gemini_api_key': '${{ secrets.GEMINI_API_KEY }}',
+            'gemini_model': 'gemini-3.5-flash',
+            'telegram_bot_token': '${{ secrets.TELEGRAM_BOT_TOKEN }}',
+            'telegram_channel_id': '${{ secrets.TELEGRAM_CHANNEL_ID }}'
+          }
+          with open('config.json', 'w') as f:
+            json.dump(config, f, indent=2)
+          "
+      
+      - name: Run handler
+        run: python main.py
