@@ -51,3 +51,12 @@ jobs:
         run: python main.py
         env:
           PYTHONPATH: ${{ github.workspace }}/src
+      
+      - name: Save temp files for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: temporary-execution-files
+          path: |
+            /tmp/logs/
+            /tmp/*.json
