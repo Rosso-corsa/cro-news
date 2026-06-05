@@ -34,7 +34,7 @@ jobs:
               {'name': 'Index HR', 'url': 'https://www.index.hr/rss/vijesti-hrvatska'},
               {'name': 'Index HR (Zagreb)', 'url': 'https://www.index.hr/rss/vijesti-zagreb'},
               {'name': '24sata.hr', 'url': 'https://www.24sata.hr/feeds/news.xml'},
-              {'name': 'Jutarnji.hr', 'url': 'https://politepaul.com/fd/M8RRsFn0lOMp.xml'},
+              {'name': 'Jutarnji.hr', 'url': 'https://www.jutarnji.hr/vijesti/hrvatska/feed'},
               {'name': 'Vecernji.hr', 'url': 'https://www.vecernji.hr/feeds/vijesti.xml'},
               {'name': 'Dnevnik.hr', 'url': 'https://dnevnik.hr/assets/feed/articles'}
             ],

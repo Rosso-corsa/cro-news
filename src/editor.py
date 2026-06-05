@@ -13,6 +13,7 @@ Public functions of this module must satisfy Pipeline Functions requirements:
 
 import json
 import logging
+import os
 from typing import List, Dict
 from rss_reader import get_recent_news
 from article_extractor import get_content
@@ -78,6 +79,7 @@ def collect_articles(config_path: str = "config.json", output_path: str = "/tmp/
         article['id'] = str(idx)
 
     # Write all articles to JSON file
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(articles, f, ensure_ascii=False, indent=2)
 
@@ -158,6 +160,7 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
                 })
 
     # Save all results to categorization file
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_results, f, ensure_ascii=False, indent=2)
 
@@ -222,6 +225,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
         result = json.loads(response)
 
         # Save groups to file
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
@@ -295,6 +299,7 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
         result = json.loads(response)
 
         # Save digest to file
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
@@ -345,7 +350,7 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str 
 
 if __name__ == "__main__":
     collect_articles()
-    categorize_articles()
-    group_articles()
-    prepare_digest()
-    publish_to_telegram()
+    #categorize_articles()
+    #group_articles()
+    #prepare_digest()
+    #publish_to_telegram()
