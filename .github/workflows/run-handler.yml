@@ -49,3 +49,5 @@ jobs:
       
       - name: Run handler
         run: python main.py
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src
