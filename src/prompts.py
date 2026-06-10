@@ -44,7 +44,7 @@ You see a list of news items. For each item, the following information is provid
 Your task:
 1. Group news items into meaningful groups. 
 2. Treat topics related to the same event or trend as the same.
-3. Give more priority to lifestyle news, deprioritize a little political, corruption or criminal news - you can still include them but only if topic is really important.
+3. Give more priority to lifestyle news and upcoming events in Zagreb, positive topics, deprioritize political, corruption or criminal news.
 4. Avoid creating groups that are too small.
 5. Include only topics related to Croatia or croatian cities/people.
 6. Return 5 to 8 main topics.
@@ -68,7 +68,7 @@ News:
 DIGEST_PREPARATION_PROMPT = """You are the editor-in-chief of a news digest.
 
 You see clusters of news items grouped by topic. Your goal is to compile a digest of 5-6 key topics of the day.
-Give more priority to lifestyle news, deprioritize a little political, corruption or criminal news - you can still include them but only if topic is really important.
+Give more priority to lifestyle news, positive topics and upcoming events in Zagreb, deprioritize political, corruption or criminal news.
 
 Choose the key topics and create:
 
