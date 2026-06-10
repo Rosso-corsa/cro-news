@@ -1,11 +1,12 @@
 name: Run Handler
 
 on:
-  schedule:
-    # Run daily at 6:00 AM UTC
-    - cron: '0 6 * * *'
   workflow_dispatch:
-    # Allow manual trigger
+    inputs:
+      mode:
+        type: string
+        default: "FULL"
+        description: "Mode of operation (FULL or ONLY_PUBLISH)"
 
 jobs:
   run-handler:
@@ -48,7 +49,7 @@ jobs:
           "
       
       - name: Run handler
-        run: python main.py
+        run: python main.py --mode ${{ github.event.inputs.mode }}
         env:
           PYTHONPATH: ${{ github.workspace }}/src
       
