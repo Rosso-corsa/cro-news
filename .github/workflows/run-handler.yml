@@ -38,7 +38,8 @@ jobs:
               {'name': 'Jutarnji.hr', 'url': 'https://www.jutarnji.hr/vijesti/hrvatska/feed'},
               {'name': 'Vecernji.hr', 'url': 'https://www.vecernji.hr/feeds/vijesti.xml'},
               {'name': 'Dnevnik.hr', 'url': 'https://dnevnik.hr/assets/feed/articles'},
-              {'name': 'Journal HR', 'url': 'https://www.journal.hr/feed/'}
+              {'name': 'Journal HR', 'url': 'https://www.journal.hr/feed/'},
+              {'name': 'ZGPortal (Zgdogadanja)', 'url': 'https://www.zgportal.com/zgdogadanja/feed/'}
             ],
             'gemini_api_key': '${{ secrets.GEMINI_API_KEY }}',
             'gemini_model': 'gemini-3.5-flash',
