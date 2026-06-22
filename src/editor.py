@@ -15,11 +15,11 @@ import json
 import logging
 import os
 from typing import List, Dict
-from rss_reader import get_recent_news
-from article_extractor import get_content
-from gemini_adapter import get_ai_response
-from telegram_adapter import send_message
-from prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
+from src.rss_reader import get_recent_news
+from src.article_extractor import get_content
+from src.gemini_adapter import get_ai_response
+from src.telegram_adapter import send_message
+from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
 
 # Configure logging
 logging.basicConfig(
