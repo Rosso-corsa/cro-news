@@ -5,7 +5,7 @@ Main entry point for the cro-news application.
 
 import logging
 import argparse
-from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_to_telegram
+from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_to_telegram, publish_article_to_telegram
 
 logging.getLogger().setLevel(logging.INFO)
 

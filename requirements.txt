@@ -14,3 +14,6 @@ google-genai
 
 # Telegram
 python-telegram-bot
+
+# S3 Storage
+boto3
