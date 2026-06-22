@@ -236,7 +236,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
         logger.error(f"Error grouping articles: {e}")
 
 
-def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json") -> None:
+def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json", config_path: str = "config.json") -> None:
     """
     Prepare a news digest by analyzing grouped articles and selecting key topics.
 
@@ -248,6 +248,7 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
         groups_path: Path to the input groups file (default: "groups.json")
         articles_path: Path to the input articles file (default: "articles.json")
         output_path: Path to the output digest file (default: "digest.json")
+        config_path: Path to the configuration file (default: "config.json")
     """
     logger.info(f"Starting digest preparation from {groups_path} and {articles_path}")
 
