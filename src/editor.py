@@ -19,8 +19,9 @@ from src.rss_reader import get_recent_news
 from src.article_extractor import get_content
 from src.gemini_adapter import get_ai_response
 from src.telegram_adapter import send_message
-from src.s3_adapter import is_s3_enabled, write_to_s3, read_from_s3
+from src.file_manager import read_file, write_file
 from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
+from src.history import update_history
 
 # Configure logging
 logging.basicConfig(
@@ -30,7 +31,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def collect_articles(config_path: str = "config.json", output_path: str = "/tmp/articles.json") -> None:
+def collect_articles(output_path: str = "/tmp/articles.json") -> None:
     """
     Collect recent news articles with full content extracted and save to file.
 
@@ -39,13 +40,12 @@ def collect_articles(config_path: str = "config.json", output_path: str = "/tmp/
     Items where content extraction fails are skipped.
 
     Args:
-        config_path: Path to the JSON configuration file (default: "config.json")
         output_path: Path to the output JSON file (default: "articles.json")
     """
     logger.info("Starting article collection")
 
     # Fetch recent news items from RSS feeds
-    news_items = get_recent_news(config_path)
+    news_items = get_recent_news()
     logger.info(f"Fetched {len(news_items)} news items from RSS feeds. Starting content extraction...")
 
     articles = []
@@ -79,10 +79,7 @@ def collect_articles(config_path: str = "config.json", output_path: str = "/tmp/
     for idx, article in enumerate(articles, start=1):
         article['id'] = str(idx)
 
-    # Write all articles to JSON file
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(articles, f, ensure_ascii=False, indent=2)
+    write_file(articles, output_path, force_local=True)
 
     logger.info(f"Saved {len(articles)} articles to {output_path}")
 
@@ -99,10 +96,7 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
         output_path: Path to the output categorization file (default: "categorization.json")
     """
     logger.info(f"Starting article categorization from {input_path}")
-
-    # Read articles from JSON file
-    with open(input_path, "r", encoding="utf-8") as f:
-        articles = json.load(f)
+    articles = read_file(input_path, force_local=True)
 
     logger.info(f"Read {len(articles)} articles from {input_path}")
 
@@ -160,10 +154,7 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
                     "id": article['id']
                 })
 
-    # Save all results to categorization file
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(all_results, f, ensure_ascii=False, indent=2)
+    write_file(all_results, output_path, force_local=True)
 
     logger.info(f"Saved {len(all_results)} categorized articles to {output_path}")
 
@@ -180,11 +171,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
         output_path: Path to the output groups file (default: "groups.json")
     """
     logger.info(f"Starting article grouping from {input_path}")
-
-    # Read categorized articles from JSON file
-    with open(input_path, "r", encoding="utf-8") as f:
-        articles = json.load(f)
-
+    articles = read_file(input_path, force_local=True)
     logger.info(f"Read {len(articles)} categorized articles from {input_path}")
 
     # Prepare news metadata for the prompt
@@ -224,11 +211,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
     try:
         response = get_ai_response(prompt, json_schema=json_schema)
         result = json.loads(response)
-
-        # Save groups to file
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(result, f, ensure_ascii=False, indent=2)
+        write_file(result, output_path, force_local=True)
 
         logger.info(f"Saved {len(result['clusters'])} groups to {output_path}")
 
@@ -236,7 +219,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
         logger.error(f"Error grouping articles: {e}")
 
 
-def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json", config_path: str = "config.json") -> None:
+def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json") -> None:
     """
     Prepare a news digest by analyzing grouped articles and selecting key topics.
 
@@ -248,16 +231,12 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
         groups_path: Path to the input groups file (default: "groups.json")
         articles_path: Path to the input articles file (default: "articles.json")
         output_path: Path to the output digest file (default: "digest.json")
-        config_path: Path to the configuration file (default: "config.json")
     """
     logger.info(f"Starting digest preparation from {groups_path} and {articles_path}")
 
     # Read groups and articles from JSON files
-    with open(groups_path, "r", encoding="utf-8") as f:
-        groups = json.load(f)
-
-    with open(articles_path, "r", encoding="utf-8") as f:
-        articles = json.load(f)
+    groups = read_file(groups_path, force_local=True)
+    articles = read_file(articles_path, force_local=True)
 
     logger.info(f"Read {len(groups['clusters'])} groups and {len(articles)} articles")
 
@@ -300,24 +279,14 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
         response = get_ai_response(prompt, json_schema=json_schema)
         result = json.loads(response)
 
-        # Save digest to file (local or S3)
-        if is_s3_enabled(config_path):
-            # Convert output_path to S3 key (strip leading /)
-            s3_key = output_path.lstrip('/')
-            write_to_s3(result, s3_key, config_path)
-            logger.info(f"Saved digest to S3: {s3_key}")
-        else:
-            # Save to local file
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-            logger.info(f"Saved digest to local file: {output_path}")
+        # Save digest to file
+        write_file(result, output_path)
 
     except Exception as e:
         logger.error(f"Error preparing digest: {e}")
 
 
-def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str = "config.json") -> None:
+def publish_to_telegram(digest_path: str = "/tmp/digest.json") -> None:
     """
     Publish news digest to Telegram channel.
 
@@ -327,19 +296,12 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str 
 
     Args:
         digest_path: Path to the input digest file (default: "digest.json")
-        config_path: Path to the configuration file with Telegram credentials (default: "config.json")
     """
     logger.info("Starting Telegram publish")
 
-    # Read digest from JSON file (local or S3)
-    if is_s3_enabled(config_path):
-        s3_key = digest_path.lstrip('/')
-        digest = read_from_s3(s3_key, config_path)
-        logger.info(f"Read {len(digest)} items from S3: {s3_key}")
-    else:
-        with open(digest_path, "r", encoding="utf-8") as f:
-            digest = json.load(f)
-        logger.info(f"Read {len(digest)} items from local file: {digest_path}")
+    # Read digest from JSON file
+    digest = read_file(digest_path)
+    logger.info(f"Read {len(digest)} items from {digest_path}")
 
     # Transform digest to Telegram message format
     message_parts = []
@@ -357,32 +319,26 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str 
     message = "\n".join(message_parts).strip()
 
     # Send to Telegram using the adapter
-    send_message(message, config_path)
+    send_message(message)
 
 
-def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str = "config.json") -> None:
+def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", history_path: str = "/tmp/history.json") -> None:
     """
     Publish the first article from digest to Telegram channel and remove it from digest.
 
     This function reads the digest from a JSON file (local or S3), takes the first news item,
     publishes it to Telegram, removes it from the digest, and writes the updated digest back.
-    This allows publishing articles one at a time.
+    This allows publishing articles one at a time. Also records the published article to history.
 
     Args:
         digest_path: Path to the input/output digest file (default: "digest.json")
-        config_path: Path to the configuration file with Telegram and S3 credentials (default: "config.json")
+        history_path: Path to the history file for tracking published articles (default: "history.json")
     """
     logger.info("Starting single article publish to Telegram")
 
-    # Read digest from JSON file (local or S3)
-    if is_s3_enabled(config_path):
-        s3_key = digest_path.lstrip('/')
-        digest = read_from_s3(s3_key, config_path)
-        logger.info(f"Read {len(digest)} items from S3: {s3_key}")
-    else:
-        with open(digest_path, "r", encoding="utf-8") as f:
-            digest = json.load(f)
-        logger.info(f"Read {len(digest)} items from local file: {digest_path}")
+    # Read digest from JSON file
+    digest = read_file(digest_path)
+    logger.info(f"Read {len(digest)} items from {digest_path}")
 
     # Check if digest is empty
     if not digest:
@@ -402,21 +358,17 @@ def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", config_pa
     message = f"<b>{title}</b>\n\n{description}\n\n{link}"
 
     # Send to Telegram using the adapter
-    send_message(message, config_path)
+    send_message(message)
+
+    # Record to history
+    update_history(history_path, title, description)
 
     # Remove the first item from digest
     updated_digest = digest[1:]
     logger.info(f"Removed published article. Remaining items: {len(updated_digest)}")
 
-    # Write updated digest back to local or S3
-    if is_s3_enabled(config_path):
-        write_to_s3(updated_digest, s3_key, config_path)
-        logger.info(f"Updated digest saved to S3: {s3_key}")
-    else:
-        os.makedirs(os.path.dirname(digest_path), exist_ok=True)
-        with open(digest_path, "w", encoding="utf-8") as f:
-            json.dump(updated_digest, f, ensure_ascii=False, indent=2)
-        logger.info(f"Updated digest saved to local file: {digest_path}")
+    # Write updated digest back
+    write_file(updated_digest, digest_path)
 
 
 if __name__ == "__main__":

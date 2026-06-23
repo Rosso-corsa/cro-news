@@ -10,26 +10,24 @@ import logging
 import asyncio
 from telegram import Bot
 from telegram.error import TelegramError
+from src.config import get_config
 
 logger = logging.getLogger(__name__)
 
 
-def send_message(message: str, config_path: str = "config.json") -> None:
+def send_message(message: str) -> None:
     """
     Send a message to Telegram channel.
 
-    This function reads the Telegram credentials from config and sends the message.
+    This function reads the Telegram credentials from global config and sends the message.
     If the message exceeds Telegram's 4096 character limit, it will be split into
     multiple messages at topic boundaries (empty lines).
 
     Args:
         message: The message text to send (can include HTML formatting)
-        config_path: Path to the configuration file with Telegram credentials (default: "config.json")
     """
     # Read configuration for Telegram credentials
-    with open(config_path, "r", encoding="utf-8") as f:
-        config = json.load(f)
-
+    config = get_config()
     bot_token = config.get('telegram_bot_token', '')
     channel_id = config.get('telegram_channel_id', '')
 

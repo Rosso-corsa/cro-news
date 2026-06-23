@@ -25,6 +25,13 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
+4. Set up environment variables:
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and fill in your actual API keys and configuration values.
+
 ## Configuration
 
 Edit `config.json` to add or modify RSS feed URLs:

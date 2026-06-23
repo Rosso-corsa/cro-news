@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any
 from dateutil import parser as date_parser
 import feedparser
+from src.config import get_config
 
 # Configure logging
 logging.basicConfig(
@@ -23,34 +24,13 @@ logger = logging.getLogger(__name__)
 
 class RSSReader:
     """RSS Feed Reader class for fetching and filtering news items."""
-    
-    def __init__(self, config_path: str = "config.json"):
+
+    def __init__(self):
         """
-        Initialize the RSS Reader with a configuration file.
-        
-        Args:
-            config_path: Path to the JSON configuration file
+        Initialize the RSS Reader with global configuration.
         """
-        self.config_path = config_path
-        self.feeds = self._load_config()
-    
-    def _load_config(self) -> List[Dict[str, str]]:
-        """
-        Load RSS feed configuration from JSON file.
-        
-        Returns:
-            List of feed configurations with 'name' and 'url' keys
-        """
-        try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-                return config.get('rss_feeds', [])
-        except FileNotFoundError:
-            logger.error(f"Configuration file not found: {self.config_path}")
-            return []
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing configuration file: {e}")
-            return []
+        config = get_config()
+        self.feeds = config.get('rss_feeds', [])
     
     def _is_within_last_24_hours(self, pub_date: Any) -> bool:
         """
@@ -151,29 +131,28 @@ class RSSReader:
         return all_items
 
 
-def get_recent_news(config_path: str = "config.json") -> List[Dict[str, Any]]:
+def get_recent_news() -> List[Dict[str, Any]]:
     """
     Convenience function to fetch recent news from all configured feeds.
-    
-    Args:
-        config_path: Path to the configuration file
-    
+
     Returns:
         List of news items from the last 24 hours
     """
-    reader = RSSReader(config_path)
+    reader = RSSReader()
     return reader.fetch_all_feeds()
 
 
 if __name__ == "__main__":
     # Test the module
+    from src.config import load_config
+    load_config()
     print("\n--- Test: Fetch all feeds from config ---")
-    reader = RSSReader("config.json")
+    reader = RSSReader()
     news_items = reader.fetch_all_feeds()
-    
+
     print(f"Total feeds configured: {len(reader.feeds)}")
     print(f"Total news items fetched: {len(news_items)}")
-    
+
     for feed in reader.feeds:
         feed_items = [item for item in news_items if item['source_feed'] == feed['name']]
         print(f"  - {feed['name']}: {len(feed_items)} items")
