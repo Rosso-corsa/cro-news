@@ -16,9 +16,9 @@ from src.file_manager import read_file, write_file
 logger = logging.getLogger(__name__)
 
 
-def read_history(history_path: str, config_path: str = "config.json") -> List[Dict]:
+def read_history(history_path: str) -> List[Dict]:
     try:
-        history = read_file(history_path, config_path)
+        history = read_file(history_path)
         logger.info(f"Read {len(history)} entries from history")
         return history
     except Exception as e:
@@ -26,7 +26,7 @@ def read_history(history_path: str, config_path: str = "config.json") -> List[Di
         return []
 
 
-def update_history(history_path: str, title: str, text: str, config_path: str = "config.json") -> None:
+def update_history(history_path: str, title: str, text: str) -> None:
     """
     Update history with a new article entry and remove entries older than 3 days.
 
@@ -34,11 +34,10 @@ def update_history(history_path: str, title: str, text: str, config_path: str = 
         history_path: Path to the history file (local or S3 key)
         title: Article title
         text: Article description/text
-        config_path: Path to the configuration file (default: "config.json")
     """
     try:
         # Read existing history
-        history = read_history(history_path, config_path)
+        history = read_history(history_path)
 
         # Create new entry with current timestamp
         new_entry = {
@@ -69,7 +68,7 @@ def update_history(history_path: str, title: str, text: str, config_path: str = 
             logger.info(f"Removed {removed_count} old entries from history")
 
         # Save updated history
-        write_file(filtered_history, history_path, config_path)
+        write_file(filtered_history, history_path)
         logger.info(f"Saved {len(filtered_history)} entries to history")
 
     except Exception as e:

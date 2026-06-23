@@ -9,20 +9,7 @@ import random
 import time
 from typing import Optional
 from google import genai
-
-# Load configuration at module initialization
-with open('config.json', 'r') as f:
-    config = json.load(f)
-
-API_KEY = config.get('gemini_api_key', '')
-MODEL_NAME = config.get('gemini_model', 'gemini-3.5-flash')
-
-# Initialize client at module initialization
-if API_KEY:
-    CLIENT = genai.Client(api_key=API_KEY)
-else:
-    CLIENT = None
-
+from src.config import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -53,16 +40,21 @@ def get_ai_response(
         RuntimeError: If all retry attempts are exhausted.
         Exception:   For non-retriable API errors.
     """
-    if not CLIENT:
-        raise ValueError("gemini_api_key is missing or empty in config.json")
+    config_dict = get_config()
+    api_key = config_dict.get('gemini_api_key', '')
+    model_name = config_dict.get('gemini_model', 'gemini-3.5-flash')
 
+    if not api_key:
+        raise ValueError("gemini_api_key is missing or empty in config")
+
+    client = genai.Client(api_key=api_key)
     config = _build_config(json_schema)
 
     last_exception: Optional[Exception] = None
     for attempt in range(3):
         try:
-            response = CLIENT.models.generate_content(
-                model=MODEL_NAME,
+            response = client.models.generate_content(
+                model=model_name,
                 contents=prompt,
                 config=config,
             )
