@@ -19,8 +19,9 @@ from src.rss_reader import get_recent_news
 from src.article_extractor import get_content
 from src.gemini_adapter import get_ai_response
 from src.telegram_adapter import send_message
-from src.s3_adapter import is_s3_enabled, write_to_s3, read_from_s3
+from src.file_manager import read_file, write_file
 from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
+from src.history import update_history
 
 # Configure logging
 logging.basicConfig(
@@ -300,18 +301,9 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
         response = get_ai_response(prompt, json_schema=json_schema)
         result = json.loads(response)
 
-        # Save digest to file (local or S3)
-        if is_s3_enabled(config_path):
-            # Convert output_path to S3 key (strip leading /)
-            s3_key = output_path.lstrip('/')
-            write_to_s3(result, s3_key, config_path)
-            logger.info(f"Saved digest to S3: {s3_key}")
-        else:
-            # Save to local file
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-            logger.info(f"Saved digest to local file: {output_path}")
+        # Save digest to file
+        write_file(result, output_path, config_path)
+        logger.info(f"Saved digest to {output_path}")
 
     except Exception as e:
         logger.error(f"Error preparing digest: {e}")
@@ -331,15 +323,9 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str 
     """
     logger.info("Starting Telegram publish")
 
-    # Read digest from JSON file (local or S3)
-    if is_s3_enabled(config_path):
-        s3_key = digest_path.lstrip('/')
-        digest = read_from_s3(s3_key, config_path)
-        logger.info(f"Read {len(digest)} items from S3: {s3_key}")
-    else:
-        with open(digest_path, "r", encoding="utf-8") as f:
-            digest = json.load(f)
-        logger.info(f"Read {len(digest)} items from local file: {digest_path}")
+    # Read digest from JSON file
+    digest = read_file(digest_path, config_path)
+    logger.info(f"Read {len(digest)} items from {digest_path}")
 
     # Transform digest to Telegram message format
     message_parts = []
@@ -360,29 +346,24 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str 
     send_message(message, config_path)
 
 
-def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str = "config.json") -> None:
+def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", config_path: str = "config.json", history_path: str = "/tmp/history.json") -> None:
     """
     Publish the first article from digest to Telegram channel and remove it from digest.
 
     This function reads the digest from a JSON file (local or S3), takes the first news item,
     publishes it to Telegram, removes it from the digest, and writes the updated digest back.
-    This allows publishing articles one at a time.
+    This allows publishing articles one at a time. Also records the published article to history.
 
     Args:
         digest_path: Path to the input/output digest file (default: "digest.json")
         config_path: Path to the configuration file with Telegram and S3 credentials (default: "config.json")
+        history_path: Path to the history file for tracking published articles (default: "history.json")
     """
     logger.info("Starting single article publish to Telegram")
 
-    # Read digest from JSON file (local or S3)
-    if is_s3_enabled(config_path):
-        s3_key = digest_path.lstrip('/')
-        digest = read_from_s3(s3_key, config_path)
-        logger.info(f"Read {len(digest)} items from S3: {s3_key}")
-    else:
-        with open(digest_path, "r", encoding="utf-8") as f:
-            digest = json.load(f)
-        logger.info(f"Read {len(digest)} items from local file: {digest_path}")
+    # Read digest from JSON file
+    digest = read_file(digest_path, config_path)
+    logger.info(f"Read {len(digest)} items from {digest_path}")
 
     # Check if digest is empty
     if not digest:
@@ -404,19 +385,16 @@ def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", config_pa
     # Send to Telegram using the adapter
     send_message(message, config_path)
 
+    # Record to history
+    update_history(history_path, title, description, config_path)
+
     # Remove the first item from digest
     updated_digest = digest[1:]
     logger.info(f"Removed published article. Remaining items: {len(updated_digest)}")
 
-    # Write updated digest back to local or S3
-    if is_s3_enabled(config_path):
-        write_to_s3(updated_digest, s3_key, config_path)
-        logger.info(f"Updated digest saved to S3: {s3_key}")
-    else:
-        os.makedirs(os.path.dirname(digest_path), exist_ok=True)
-        with open(digest_path, "w", encoding="utf-8") as f:
-            json.dump(updated_digest, f, ensure_ascii=False, indent=2)
-        logger.info(f"Updated digest saved to local file: {digest_path}")
+    # Write updated digest back
+    write_file(updated_digest, digest_path, config_path)
+    logger.info(f"Updated digest saved to {digest_path}")
 
 
 if __name__ == "__main__":
