@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 def read_history(history_path: str) -> List[Dict]:
     try:
         history = read_file(history_path)
+        if history == {}:
+            history = []
         logger.info(f"Read {len(history)} entries from history")
         return history
     except Exception as e:

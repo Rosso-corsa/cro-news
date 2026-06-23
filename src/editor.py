@@ -21,7 +21,7 @@ from src.gemini_adapter import get_ai_response
 from src.telegram_adapter import send_message
 from src.file_manager import read_file, write_file
 from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
-from src.history import update_history
+from src.history import update_history, read_history
 
 # Configure logging
 logging.basicConfig(
@@ -219,18 +219,19 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
         logger.error(f"Error grouping articles: {e}")
 
 
-def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json") -> None:
+def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json", history_path: str = "/tmp/history.json") -> None:
     """
     Prepare a news digest by analyzing grouped articles and selecting key topics.
 
     This function reads groups and articles from JSON files, replaces news_ids with
     full article details (link, title, text), and sends them to Gemini AI to create
-    a digest of 3-5 key topics of the day in Russian.
+    a digest of 3-5 key topics of the day in Russian. Also reads history to avoid duplicates.
 
     Args:
         groups_path: Path to the input groups file (default: "groups.json")
         articles_path: Path to the input articles file (default: "articles.json")
         output_path: Path to the output digest file (default: "digest.json")
+        history_path: Path to the history file with previously published articles (default: "history.json")
     """
     logger.info(f"Starting digest preparation from {groups_path} and {articles_path}")
 
@@ -257,8 +258,16 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
                 cluster_news += "  ---\n"
         cluster_news += "======END OF CLUSTER=======\n"
 
+    # Read and format history
+    history = read_history(history_path)
+    history_news = ""
+    for entry in history:
+        history_news += f"Title: {entry.get('title', '')}\n"
+        history_news += f"Text: {entry.get('text', '')}\n"
+        history_news += "---\n"
+
     # Build the prompt
-    prompt = DIGEST_PREPARATION_PROMPT.format(cluster_news=cluster_news)
+    prompt = DIGEST_PREPARATION_PROMPT.format(cluster_news=cluster_news, history=history_news)
 
     # JSON schema for structured output
     json_schema = {

@@ -47,7 +47,7 @@ Your task:
 3. Give more priority to lifestyle news and upcoming events in Zagreb, positive topics, deprioritize political, corruption or criminal news.
 4. Avoid creating groups that are too small.
 5. Include only topics related to Croatia or croatian cities/people.
-6. Return 5 to 8 main topics.
+6. Return 5 to 10 main topics.
 
 Return strictly JSON:
 
@@ -69,6 +69,7 @@ DIGEST_PREPARATION_PROMPT = """You are the editor-in-chief of a news digest.
 
 You see clusters of news items grouped by topic. Your goal is to compile a digest of 5-6 key topics of the day.
 Give more priority to lifestyle news, positive topics and upcoming events in Zagreb, deprioritize political, corruption or criminal news.
+You are also given history of previously published articles, avoid publishing the same again. But you can publish updated information about the same topic if it's important.
 
 Choose the key topics and create:
 
@@ -91,4 +92,8 @@ Return JSON:
 
 News:
 
-{cluster_news}"""
+{cluster_news}
+
+History:
+
+{history}"""
