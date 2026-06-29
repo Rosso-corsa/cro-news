@@ -17,7 +17,7 @@ import os
 from typing import List, Dict
 from src.rss_reader import get_recent_news
 from src.article_extractor import get_content
-from src.gemini_adapter import get_ai_response
+from src.ai_adapter import get_ai_response
 from src.telegram_adapter import send_message
 from src.file_manager import read_file, write_file
 from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT

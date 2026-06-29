@@ -21,7 +21,8 @@ _CONFIG_LOADED = False
 
 
 def load_config(
-    gemini_api_key: Optional[str] = None,
+    ai_api_key: Optional[str] = None,
+    ai_model: Optional[str] = None,
     telegram_bot_token: Optional[str] = None,
     telegram_channel_id: Optional[str] = None,
     s3_access_key: Optional[str] = None,
@@ -49,8 +50,10 @@ def load_config(
 
     # Override secrets from CLI args or environment variables
     # CLI args take precedence over environment variables
-    if gemini_api_key or os.getenv("GEMINI_API_KEY"):
-        CONFIG["gemini_api_key"] = gemini_api_key or os.getenv("GEMINI_API_KEY")
+    if ai_api_key or os.getenv("AI_API_KEY"):
+        CONFIG["ai_api_key"] = ai_api_key or os.getenv("AI_API_KEY")
+    if ai_model or os.getenv("AI_MODEL"):
+        CONFIG["ai_model"] = ai_model or os.getenv("AI_MODEL")
     if telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN"):
         CONFIG["telegram_bot_token"] = telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
     if telegram_channel_id or os.getenv("TELEGRAM_CHANNEL_ID"):

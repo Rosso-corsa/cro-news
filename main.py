@@ -12,7 +12,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 def handler(mode: str = "FULL"):
     if mode == "FULL":
-        collect_articles()
+        #collect_articles()
         categorize_articles()
         group_articles()
         prepare_digest()
@@ -26,8 +26,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the cro-news handler")
     parser.add_argument("--mode", type=str, default="FULL", choices=["FULL", "ONLY_PUBLISH"],
                         help="Mode of operation (FULL or ONLY_PUBLISH)")
-    parser.add_argument("--gemini-api-key", type=str, default=None,
-                        help="Gemini API key (overrides .env)")
+    parser.add_argument("--ai-api-key", type=str, default=None,
+                        help="AI API key (overrides .env)")
+    parser.add_argument("--ai-model", type=str, default=None,
+                        help="AI model name (overrides .env)")
     parser.add_argument("--telegram-bot-token", type=str, default=None,
                         help="Telegram bot token (overrides .env)")
     parser.add_argument("--telegram-channel-id", type=str, default=None,
@@ -40,7 +42,8 @@ if __name__ == "__main__":
 
     # Load configuration with secrets
     load_config(
-        gemini_api_key=args.gemini_api_key,
+        ai_api_key=args.ai_api_key,
+        ai_model=args.ai_model,
         telegram_bot_token=args.telegram_bot_token,
         telegram_channel_id=args.telegram_channel_id,
         s3_access_key=args.s3_access_key,

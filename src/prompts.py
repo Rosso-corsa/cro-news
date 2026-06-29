@@ -74,11 +74,11 @@ You are also given history of previously published articles, avoid publishing th
 Choose the key topics and create:
 
 1. Short topic title (up to 10 words).
-2. Summary - description of what happened (3-5 sentences).
+2. Summary - description of what happened (3-5 sentences). Don't use sophisticated vocabulary, keep it simple and clear, lifestyle magaize style.
 3. Link to article which describes the topic mostly.
 4. Why this topic is important (for internal evaluation).
 
-All text must be written in Russian.
+All text must be written in Russian. Double check that only words in Russian are used, fix mistakes if found.
 Return JSON:
 
 [
