@@ -12,7 +12,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 def handler(mode: str = "FULL"):
     if mode == "FULL":
-        #collect_articles()
+        collect_articles()
         categorize_articles()
         group_articles()
         prepare_digest()
