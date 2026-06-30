@@ -18,6 +18,7 @@ Requirements. For each news item:
 - organizations
 3. Identify 1 to 5 key topics.
 4. Do not invent facts that are not in the text.
+5. Write in English.
 
 Response format (array of objects, one per news item):
 [

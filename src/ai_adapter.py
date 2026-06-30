@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 _RETRIABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
 _RETRIABLE_ERROR_KEYWORDS = frozenset(["rate limit", "timeout", "network", "temporary", "try again"])
 
+_MAX_RETRIES = 5
+_DELAY_BASE = 20.0
+
 # OpenRouter API endpoint
 _OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -79,7 +82,7 @@ def _get_gemini_response(
     config = _build_gemini_config(json_schema)
 
     last_exception: Optional[Exception] = None
-    for attempt in range(3):
+    for attempt in range(_MAX_RETRIES):
         try:
             response = client.models.generate_content(
                 model=model_name,
@@ -106,18 +109,18 @@ def _get_gemini_response(
             if not _is_retriable(exc):
                 raise
 
-            if attempt < 2:
-                delay = _backoff_delay(1.0, attempt)
+            if attempt < _MAX_RETRIES - 1:
+                delay = _backoff_delay(_DELAY_BASE, attempt)
                 logger.warning(
-                    "Retriable error on attempt %d/3, retrying in %.1fs: %s",
-                    attempt + 1, delay, exc,
+                    "Retriable error on attempt %d/%d, retrying in %.1fs: %s",
+                    attempt + 1, _MAX_RETRIES, delay, exc,
                 )
                 time.sleep(delay)
             else:
-                logger.error("All 3 retry attempts exhausted.")
+                logger.error("All %d retry attempts exhausted.", _MAX_RETRIES)
 
     raise RuntimeError(
-        "Gemini API unavailable after 3 attempts"
+        f"Gemini API unavailable after {_MAX_RETRIES} attempts"
     ) from last_exception
 
 
@@ -146,7 +149,7 @@ def _get_openrouter_response(
         }
 
     last_exception: Optional[Exception] = None
-    for attempt in range(3):
+    for attempt in range(_MAX_RETRIES):
         try:
             response = requests.post(
                 url=_OPENROUTER_API_URL,
@@ -178,18 +181,18 @@ def _get_openrouter_response(
             if not _is_retriable_openrouter(exc):
                 raise
 
-            if attempt < 2:
-                delay = _backoff_delay(1.0, attempt)
+            if attempt < _MAX_RETRIES - 1:
+                delay = _backoff_delay(_DELAY_BASE, attempt)
                 logger.warning(
-                    "Retriable error on attempt %d/3, retrying in %.1fs: %s",
-                    attempt + 1, delay, exc,
+                    "Retriable error on attempt %d/%d, retrying in %.1fs: %s",
+                    attempt + 1, _MAX_RETRIES, delay, exc,
                 )
                 time.sleep(delay)
             else:
-                logger.error("All 3 retry attempts exhausted.")
+                logger.error("All %d retry attempts exhausted.", _MAX_RETRIES)
 
     raise RuntimeError(
-        "OpenRouter API unavailable after 3 attempts"
+        f"OpenRouter API unavailable after {_MAX_RETRIES} attempts"
     ) from last_exception
 
 
@@ -246,4 +249,4 @@ def _raise_if_auth_error_openrouter(exc: Exception) -> None:
 def _backoff_delay(base: float, attempt: int) -> float:
     """Exponential backoff with full jitter to avoid thundering herd."""
     ceiling = base * (2 ** attempt)
-    return random.uniform(0, ceiling)
+    return random.uniform(ceiling/2, ceiling)
