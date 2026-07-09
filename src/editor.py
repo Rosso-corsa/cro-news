@@ -119,9 +119,10 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
                     "type": "array",
                     "items": {"type": "string"}
                 },
+                "relevance": {"type": "integer"},
                 "id": {"type": "string"}
             },
-            "required": ["summary", "entities", "topics", "id"]
+            "required": ["summary", "entities", "topics", "relevance", "id"]
         }
     }
 
@@ -173,6 +174,10 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
     logger.info(f"Starting article grouping from {input_path}")
     articles = read_file(input_path, force_local=True)
     logger.info(f"Read {len(articles)} categorized articles from {input_path}")
+
+    filtered_articles = [article for article in articles if not ('relevance' in article and article['relevance'] <= 4)]
+    logger.info(f"Filtered out {len(articles) - len(filtered_articles)} articles with relevance <= 4. Remaining: {len(filtered_articles)}")
+    articles = filtered_articles
 
     # Prepare news metadata for the prompt
     news_metadata = ""

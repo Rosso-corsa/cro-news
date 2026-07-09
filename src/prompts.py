@@ -17,8 +17,15 @@ Requirements. For each news item:
 - countries
 - organizations
 3. Identify 1 to 5 key topics.
-4. Do not invent facts that are not in the text.
-5. Write in English.
+4. Estimate from 1 to 10 based on how this article is aligned with the following rules:
+- The article is about Croatia or Zagreb;
+- It's a positive news;
+- News about upcoming or passed public events or festivals in Zagreb;
+- Imporant news for expacts living in Zagreb;
+- Not criminal/corruption/political news;
+- Lifestyle-related article.
+5. Do not invent facts that are not in the text.
+6. Write in English.
 
 Response format (array of objects, one per news item):
 [
@@ -26,6 +33,7 @@ Response format (array of objects, one per news item):
     "summary": "...",
     "entities": ["..."],
     "topics": ["..."],
+    "relevance": N,
     "id": "..."
   }}
 ]
