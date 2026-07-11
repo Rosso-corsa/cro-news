@@ -33,11 +33,7 @@ logger = logging.getLogger(__name__)
 
 def collect_articles(output_path: str = "/tmp/articles.json") -> None:
     """
-    Collect recent news articles with full content extracted and save to file.
-
-    This function fetches recent news items from RSS feeds, extracts
-    the full article text for each item, and saves them to a JSON file.
-    Items where content extraction fails are skipped.
+    Collect recent news articles with full content and save to file.
 
     Args:
         output_path: Path to the output JSON file (default: "articles.json")
@@ -87,9 +83,6 @@ def collect_articles(output_path: str = "/tmp/articles.json") -> None:
 def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str = "/tmp/categorization.json") -> None:
     """
     Categorize articles using AI analysis.
-
-    This function reads articles from a JSON file, sends them to
-    Gemini AI for categorization in batches, and saves the results.
 
     Args:
         input_path: Path to the input articles file (default: "articles.json")
@@ -162,10 +155,7 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
 
 def group_articles(input_path: str = "/tmp/categorization.json", output_path: str = "/tmp/groups.json") -> None:
     """
-    Group articles into meaningful clusters using AI analysis.
-
-    This function reads categorized articles from a JSON file, sends them to
-    Gemini AI for grouping into clusters, and saves the results.
+    Group articles into clusters using AI analysis.
 
     Args:
         input_path: Path to the input categorization file (default: "categorization.json")
@@ -226,11 +216,7 @@ def group_articles(input_path: str = "/tmp/categorization.json", output_path: st
 
 def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "/tmp/articles.json", output_path: str = "/tmp/digest.json", history_path: str = "/tmp/history.json") -> None:
     """
-    Prepare a news digest by analyzing grouped articles and selecting key topics.
-
-    This function reads groups and articles from JSON files, replaces news_ids with
-    full article details (link, title, text), and sends them to Gemini AI to create
-    a digest of 3-5 key topics of the day in Russian. Also reads history to avoid duplicates.
+    Prepare news digest from grouped articles.
 
     Args:
         groups_path: Path to the input groups file (default: "groups.json")
@@ -283,9 +269,10 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
                 "title": {"type": "string"},
                 "description": {"type": "string"},
                 "link": {"type": "string"},
-                "importance_reason": {"type": "string"}
+                "resolution": {"type": "integer"},
+                "justification": {"type": "string"}
             },
-            "required": ["title", "description", "link", "importance_reason"]
+            "required": ["title", "description", "link", "resolution"]
         }
     }
 
@@ -303,10 +290,6 @@ def prepare_digest(groups_path: str = "/tmp/groups.json", articles_path: str = "
 def publish_to_telegram(digest_path: str = "/tmp/digest.json") -> None:
     """
     Publish news digest to Telegram channel.
-
-    This function reads the digest from a JSON file (local or S3), transforms it to Telegram message format,
-    and sends it to a Telegram channel using the telegram_adapter module. Each news item includes
-    title (bold), description, and link. Items are combined into one message separated by empty lines.
 
     Args:
         digest_path: Path to the input digest file (default: "digest.json")
@@ -338,11 +321,7 @@ def publish_to_telegram(digest_path: str = "/tmp/digest.json") -> None:
 
 def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", history_path: str = "/tmp/history.json") -> None:
     """
-    Publish the first article from digest to Telegram channel and remove it from digest.
-
-    This function reads the digest from a JSON file (local or S3), takes the first news item,
-    publishes it to Telegram, removes it from the digest, and writes the updated digest back.
-    This allows publishing articles one at a time. Also records the published article to history.
+    Publish single article from digest to Telegram.
 
     Args:
         digest_path: Path to the input/output digest file (default: "digest.json")
@@ -354,12 +333,13 @@ def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", history_p
     digest = read_file(digest_path)
     logger.info(f"Read {len(digest)} items from {digest_path}")
 
-    # Check if digest is empty
+    while digest and digest[0].get('resolution') == 0:
+        digest = digest[1:]
+        logger.info(f"Skipped non-published article. Remaining items: {len(digest)}")
+
     if not digest:
         logger.warning("Digest is empty, nothing to publish")
         return
-
-    # Take the first item
     first_item = digest[0]
     logger.info(f"Publishing article: {first_item.get('title', 'Untitled')}")
 

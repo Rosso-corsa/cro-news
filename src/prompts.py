@@ -51,12 +51,11 @@ You see a list of news items. For each item, the following information is provid
 - entities
 
 Your task:
-1. Group news items into meaningful groups. 
-2. Treat topics related to the same event or trend as the same.
-3. Give more priority to lifestyle news and upcoming events in Zagreb, positive topics, deprioritize political, corruption or criminal news.
-4. Avoid creating groups that are too small.
-5. Include only topics related to Croatia or croatian cities/people.
-6. Return 5 to 10 main topics.
+1. Aggregate articles into groups related to the same event or news.
+2. Return from 3 to 15 main topics. Select topics based on criteria:
+- This is Croatia or Zagreb specific news/event
+- It affects expats living in Croatia, Zagreb
+- It's not a political, corruption or criminal related news
 
 Return strictly JSON:
 
@@ -74,20 +73,23 @@ News:
 {news_metadata}"""
 
 
-DIGEST_PREPARATION_PROMPT = """You are the editor-in-chief of a news digest.
+DIGEST_PREPARATION_PROMPT = """You are the editor-in-chief of a news lifestyle digest for expats.
 
-You see clusters of news items grouped by topic. Your goal is to compile a digest of 5-6 key topics of the day.
-Give more priority to lifestyle news, positive topics and upcoming events in Zagreb, deprioritize political, corruption or criminal news.
+You see clusters of news items grouped by topic. Your goal is to compile a digest of the day. Recommendations:
+* It's a lifestyle media, so prioritize such topics. Depreoritize political or criminal news if they are not critical;
+* The digest should be about Croatia and/or Zagreb;
+* The news should be more or less relevant for expats.
+
 You are also given history of previously published articles, avoid publishing the same again. But you can publish updated information about the same topic if it's important.
 
-Choose the key topics and create:
-
+For each provided cluster create:
 1. Short topic title (up to 10 words).
-2. Summary - description of what happened (3-5 sentences). Don't use sophisticated vocabulary, keep it simple and clear, lifestyle magaize style.
+2. Summary - description of what happened (3-5 sentences). Don't use sophisticated vocabulary, keep it simple and clear, lifestyle magazine style.
 3. Link to article which describes the topic mostly.
-4. Why this topic is important (for internal evaluation).
+4. Resolution - publish or not publish (1 - publish, 0 - not publish).
+5. Justification - if cluster resolution is "not publish", provide short explanation why.
 
-All text must be written in Russian. Double check that only words in Russian are used, fix mistakes if found.
+All text must be written in Russian. Double check grammar, fix mistakes if found.
 Return JSON:
 
 [
@@ -95,7 +97,8 @@ Return JSON:
   "title": "...",
   "description": "...",
   "link": "...",
-  "importance_reason": "..."
+  "resolution": 0/1
+  "justification": "..."
   }}
 ]
 
