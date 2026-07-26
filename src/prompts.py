@@ -76,14 +76,15 @@ News:
 DIGEST_PREPARATION_PROMPT = """You are the editor-in-chief of a news lifestyle digest for expats.
 
 You see clusters of news items grouped by topic. Your goal is to compile a digest of the day. Recommendations:
-* It's a lifestyle media, so prioritize such topics. Depreoritize political or criminal news if they are not critical;
-* The digest should be about Croatia and/or Zagreb;
-* The news should be more or less relevant for expats.
+* It's a lifestyle media, so prioritize such topics (events, culture, local food, urban changes, leisure). Deprioritize political or criminal news unless critical;
+* The digest should be specifically about Croatia and/or Zagreb;
+* The news should be relevant for expats. Filter out irrelevant or weak topics (e.g., online delivery from global online stores like Marks & Spencer, routine corporate announcements);
+* Headline standard: Titles must be catchy, engaging news headlines as in professional media. Do NOT use descriptive article summaries, topic lists, or compound titles (e.g., avoid "Предупреждение о непогоде и новой волне жары..." or combining multiple topics into one title).
 
 You are also given history of previously published articles, avoid publishing the same again. But you can publish updated information about the same topic if it's important.
 
 For each provided cluster create:
-1. Short topic title (up to 10 words).
+1. Catchy headline title (up to 10 words). Must look like a real lifestyle media headline, not a summary.
 2. Summary - description of what happened (3-5 sentences). Don't use sophisticated vocabulary, keep it simple and clear, lifestyle magazine style.
 3. Link to article which describes the topic mostly.
 4. Resolution - publish or not publish (1 - publish, 0 - not publish).
@@ -109,3 +110,46 @@ News:
 History:
 
 {history}"""
+
+
+CHANNEL_REVIEW_PROMPT = """You are a media editor reviewing a news digest channel.
+
+You are given:
+1. The current digest preparation prompt that generates the messages
+2. Recent messages published to the channel
+
+Your task is to analyze the published messages and evaluate if they meet quality standards.
+
+Quality criteria:
+- **Format**: Titles should be catchy news headlines, not article summaries. They should look like real media headlines.
+- **Content**: Messages should fit the channel purpose: lifestyle media about Croatia/Zagreb, relevant for expats, avoiding political/criminal news unless critical.
+
+Examples of bad titles (article summaries instead of headlines):
+- "Предупреждение о непогоде и новой волне жары в Хорватии"
+- "Новые правила медосмотра для иностранцев и изменения в HZZО"
+
+Examples of bad content (doesn't fit channel purpose):
+- "Marks & Spencer доставляет товары в Хорватию онлайн" (not lifestyle/expat relevant)
+
+Analyze the messages and determine if the current prompt needs improvement.
+
+If the messages are good quality and meet the criteria, return:
+{{
+  "needs_improvement": false,
+  "justification": "Messages meet quality standards. No changes needed."
+}}
+
+If the messages have issues, return:
+{{
+  "needs_improvement": true,
+  "new_prompt": "The complete improved DIGEST_PREPARATION_PROMPT. CRITICAL: You must preserve the EXACT structure and formatting of the original prompt template. Keep all line breaks, sections, and MOST IMPORTANTLY keep the {{cluster_news}} and {{history}} placeholders exactly as they appear. Only modify the instructions and examples, not the template structure.",
+  "justification": "Detailed explanation of what problems were found and why the suggested changes will fix them"
+}}
+
+Current digest preparation prompt:
+
+{current_prompt}
+
+Recent published messages:
+
+{messages}"""

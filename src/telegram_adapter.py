@@ -15,7 +15,7 @@ from src.config import get_config
 logger = logging.getLogger(__name__)
 
 
-def send_message(message: str) -> None:
+def send_message(message: str, channel_id: str = None) -> None:
     """
     Send a message to Telegram channel.
 
@@ -25,13 +25,14 @@ def send_message(message: str) -> None:
 
     Args:
         message: The message text to send (can include HTML formatting)
+        channel_id: Optional channel ID override. If not provided, uses default from config.
     """
     # Read configuration for Telegram credentials
     config = get_config()
     bot_token = config.get('telegram_bot_token', '')
-    channel_id = config.get('telegram_channel_id', '')
+    target_channel_id = channel_id or config.get('telegram_channel_id', '')
 
-    if not bot_token or not channel_id:
+    if not bot_token or not target_channel_id:
         logger.error("Telegram bot token or channel ID not found in config")
         return
 
@@ -67,7 +68,7 @@ def send_message(message: str) -> None:
         bot = Bot(token=bot_token)
         async with bot:
             for idx, msg in enumerate(messages_to_send, 1):
-                await bot.send_message(chat_id=channel_id, text=msg, parse_mode='HTML')
+                await bot.send_message(chat_id=target_channel_id, text=msg, parse_mode='HTML')
                 logger.info(f"Sent message part {idx}/{len(messages_to_send)}")
 
     try:

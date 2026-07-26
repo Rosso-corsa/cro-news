@@ -20,7 +20,8 @@ from src.article_extractor import get_content
 from src.ai_adapter import get_ai_response
 from src.telegram_adapter import send_message
 from src.file_manager import read_file, write_file
-from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT
+from src.config import get_config
+from src.prompts import NEWS_ANALYSIS_PROMPT, NEWS_GROUPING_PROMPT, DIGEST_PREPARATION_PROMPT, CHANNEL_REVIEW_PROMPT
 from src.history import update_history, read_history
 
 # Configure logging
@@ -365,9 +366,86 @@ def publish_article_to_telegram(digest_path: str = "/tmp/digest.json", history_p
     write_file(updated_digest, digest_path)
 
 
+def review_channel(message_limit: int = 15, history_path: str = "/tmp/history.json") -> None:
+    """
+    Review recent published messages from history and suggest prompt improvements.
+
+    This function reads the history file containing published articles,
+    analyzes them against the current digest prompt, and sends
+    suggestions for prompt improvements to a review channel.
+
+    Args:
+        message_limit: Number of recent messages to analyze (default: 15)
+        history_path: Path to the history file (default: "/tmp/history.json")
+    """
+    logger.info(f"Starting channel review with message limit: {message_limit}")
+
+    # Read history file
+    history = read_history(history_path)
+    
+    if not history:
+        logger.warning("No messages found in history, skipping review")
+        return
+
+    # Get the most recent messages (history is in chronological order, so take from end)
+    recent_messages = history[-message_limit:] if len(history) > message_limit else history
+    logger.info(f"Analyzing {len(recent_messages)} recent messages from history")
+
+    # Format messages for the prompt - reconstruct the Telegram message format
+    messages_text = ""
+    for idx, entry in enumerate(recent_messages, 1):
+        title = entry.get('title', '')
+        text = entry.get('text', '')
+        message = f"<b>{title}</b>\n\n{text}"
+        messages_text += f"Message {idx}:\n{message}\n{'-'*50}\n"
+
+    # Build the review prompt
+    prompt = CHANNEL_REVIEW_PROMPT.format(
+        current_prompt=DIGEST_PREPARATION_PROMPT,
+        messages=messages_text
+    )
+
+    # JSON schema for structured output
+    json_schema = {
+        "type": "object",
+        "properties": {
+            "needs_improvement": {"type": "boolean"},
+            "new_prompt": {"type": "string"},
+            "justification": {"type": "string"}
+        },
+        "required": ["needs_improvement", "justification"]
+    }
+
+    try:
+        response = get_ai_response(prompt, json_schema=json_schema)
+        result = json.loads(response)
+        
+        logger.info(f"Review completed. Needs improvement: {result.get('needs_improvement')}")
+        config = get_config()
+        review_channel_id = config.get('telegram_channel_review_id', '')
+        
+        if not review_channel_id:
+            logger.warning("Review channel ID not configured, skipping notification")
+            return
+
+        if result.get('needs_improvement'):
+            message = f"<b>Channel Review: Prompt Improvement Suggested</b>\n\n"
+            message += f"<b>Justification:</b>\n{result.get('justification', '')}\n\n"
+            message += f"<b>Suggested New Prompt:</b>\n<pre>{result.get('new_prompt', '')}</pre>"
+        else:
+            message = f"<b>Channel Review: No Issues Found</b>\n\n"
+            message += result.get('justification', 'Messages meet quality standards.')
+
+        send_message(message, channel_id=review_channel_id)
+        logger.info("Review results sent to review channel")
+
+    except Exception as e:
+        logger.error(f"Error during channel review: {e}")
+
+
 if __name__ == "__main__":
     collect_articles()
-    #categorize_articles()
-    #group_articles()
-    #prepare_digest()
-    #publish_to_telegram()
+    categorize_articles()
+    group_articles()
+    prepare_digest()
+    publish_to_telegram()

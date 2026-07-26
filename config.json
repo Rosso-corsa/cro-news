@@ -37,6 +37,7 @@
   "gemini_model": "gemini-3.5-flash",
   "telegram_bot_token": "",
   "telegram_channel_id": "",
+  "telegram_channel_review_id": "",
   "s3_access_key": "",
   "s3_secret_key": ""
 }

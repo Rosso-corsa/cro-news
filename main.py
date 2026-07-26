@@ -6,11 +6,11 @@ Main entry point for the cro-news application.
 import logging
 import argparse
 from src.config import load_config
-from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram
+from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram, review_channel
 
 logging.getLogger().setLevel(logging.INFO)
 
-def handler(mode: str = "FULL"):
+def handler(mode: str = "FULL", message_limit: int = 15):
     if mode == "FULL":
         collect_articles()
         categorize_articles()
@@ -18,14 +18,18 @@ def handler(mode: str = "FULL"):
         prepare_digest()
     elif mode == "ONLY_PUBLISH":
         publish_article_to_telegram()
+    elif mode == "CHANNEL_REVIEW":
+        review_channel(message_limit=message_limit)
     else:
-        raise ValueError(f"Invalid mode: {mode}. Must be 'FULL' or 'ONLY_PUBLISH'.")
+        raise ValueError(f"Invalid mode: {mode}. Must be 'FULL', 'ONLY_PUBLISH', or 'CHANNEL_REVIEW'.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the cro-news handler")
-    parser.add_argument("--mode", type=str, default="FULL", choices=["FULL", "ONLY_PUBLISH"],
-                        help="Mode of operation (FULL or ONLY_PUBLISH)")
+    parser.add_argument("--mode", type=str, default="FULL", choices=["FULL", "ONLY_PUBLISH", "CHANNEL_REVIEW"],
+                        help="Mode of operation (FULL, ONLY_PUBLISH, or CHANNEL_REVIEW)")
+    parser.add_argument("--message-limit", type=int, default=15,
+                        help="Number of messages to analyze in CHANNEL_REVIEW mode (default: 15)")
     parser.add_argument("--ai-api-key", type=str, default=None,
                         help="AI API key (overrides .env)")
     parser.add_argument("--ai-model", type=str, default=None,
@@ -34,6 +38,8 @@ if __name__ == "__main__":
                         help="Telegram bot token (overrides .env)")
     parser.add_argument("--telegram-channel-id", type=str, default=None,
                         help="Telegram channel ID (overrides .env)")
+    parser.add_argument("--telegram-channel-review-id", type=str, default=None,
+                        help="Telegram review channel ID (overrides .env)")
     parser.add_argument("--s3-access-key", type=str, default=None,
                         help="S3 access key (overrides .env)")
     parser.add_argument("--s3-secret-key", type=str, default=None,
@@ -46,8 +52,9 @@ if __name__ == "__main__":
         ai_model=args.ai_model,
         telegram_bot_token=args.telegram_bot_token,
         telegram_channel_id=args.telegram_channel_id,
+        telegram_channel_review_id=args.telegram_channel_review_id,
         s3_access_key=args.s3_access_key,
         s3_secret_key=args.s3_secret_key
     )
 
-    handler(args.mode)
+    handler(args.mode, message_limit=args.message_limit)

@@ -25,6 +25,7 @@ def load_config(
     ai_model: Optional[str] = None,
     telegram_bot_token: Optional[str] = None,
     telegram_channel_id: Optional[str] = None,
+    telegram_channel_review_id: Optional[str] = None,
     s3_access_key: Optional[str] = None,
     s3_secret_key: Optional[str] = None,
     config_path: str = "config.json"
@@ -58,6 +59,8 @@ def load_config(
         CONFIG["telegram_bot_token"] = telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
     if telegram_channel_id or os.getenv("TELEGRAM_CHANNEL_ID"):
         CONFIG["telegram_channel_id"] = telegram_channel_id or os.getenv("TELEGRAM_CHANNEL_ID")
+    if telegram_channel_review_id or os.getenv("TELEGRAM_CHANNEL_REVIEW_ID"):
+        CONFIG["telegram_channel_review_id"] = telegram_channel_review_id or os.getenv("TELEGRAM_CHANNEL_REVIEW_ID")
     if s3_access_key or os.getenv("S3_ACCESS_KEY"):
         CONFIG["s3_access_key"] = s3_access_key or os.getenv("S3_ACCESS_KEY")
     if s3_secret_key or os.getenv("S3_SECRET_KEY"):

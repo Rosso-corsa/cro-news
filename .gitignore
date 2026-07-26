@@ -38,3 +38,8 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Project
+docs/
+.agents/
+.scratch/
