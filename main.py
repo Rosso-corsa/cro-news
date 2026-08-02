@@ -6,7 +6,7 @@ Main entry point for the cro-news application.
 import logging
 import argparse
 from src.config import load_config
-from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram, review_channel
+from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram, review_channel, stream_collect_articles, stream_process_articles, stream_publish_top
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -20,14 +20,18 @@ def handler(mode: str = "FULL", message_limit: int = 15):
         publish_article_to_telegram()
     elif mode == "CHANNEL_REVIEW":
         review_channel(message_limit=message_limit)
+    elif mode == "STREAM":
+        stream_collect_articles()
+        stream_process_articles()
+        stream_publish_top()
     else:
-        raise ValueError(f"Invalid mode: {mode}. Must be 'FULL', 'ONLY_PUBLISH', or 'CHANNEL_REVIEW'.")
+        raise ValueError(f"Invalid mode: {mode}. Must be 'FULL', 'ONLY_PUBLISH', 'CHANNEL_REVIEW', or 'STREAM'.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the cro-news handler")
-    parser.add_argument("--mode", type=str, default="FULL", choices=["FULL", "ONLY_PUBLISH", "CHANNEL_REVIEW"],
-                        help="Mode of operation (FULL, ONLY_PUBLISH, or CHANNEL_REVIEW)")
+    parser.add_argument("--mode", type=str, default="FULL", choices=["FULL", "ONLY_PUBLISH", "CHANNEL_REVIEW", "STREAM"],
+                        help="Mode of operation (FULL, ONLY_PUBLISH, CHANNEL_REVIEW, or STREAM)")
     parser.add_argument("--message-limit", type=int, default=15,
                         help="Number of messages to analyze in CHANNEL_REVIEW mode (default: 15)")
     parser.add_argument("--ai-api-key", type=str, default=None,

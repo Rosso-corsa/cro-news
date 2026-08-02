@@ -6,7 +6,7 @@ on:
       mode:
         type: string
         default: "FULL"
-        description: "Mode of operation (FULL or ONLY_PUBLISH)"
+        description: "Mode of operation (FULL, ONLY_PUBLISH, CHANNEL_REVIEW, or STREAM)"
 
 jobs:
   run-handler:
