@@ -7,7 +7,7 @@ This module handles calculation of the publish-meter metric for news items.
 
 import logging
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from typing import List, Dict
 
@@ -23,7 +23,11 @@ def calculate_time_coef(last_update_time: str) -> float:
             # Fall back to RFC 2822 format
             last_update = parsedate_to_datetime(last_update_time)
         
-        now = datetime.now()
+        # Ensure both datetimes are timezone-aware
+        if last_update.tzinfo is None:
+            last_update = last_update.replace(tzinfo=timezone.utc)
+        
+        now = datetime.now(timezone.utc)
         time_diff = now - last_update
         hours = time_diff.total_seconds() / 3600
 
