@@ -22,7 +22,7 @@ Requirements. For each news item:
 - It's a positive news;
 - News about upcoming or passed public events or festivals in Zagreb;
 - Imporant news for expacts living in Zagreb;
-- Not criminal/corruption/political news;
+- Not criminal/corruption/political/beatuty/fashion news;
 - Lifestyle-related article.
 5. Do not invent facts that are not in the text.
 6. Write in English.
