@@ -108,25 +108,6 @@ CHANNEL_REVIEW_JSON_SCHEMA = {
     "required": ["needs_improvement", "justification"]
 }
 
-BULK_DEDUPLICATION_JSON_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "results": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {"type": "string"},
-                    "status": {"type": "string", "enum": ["new", "match_unpublished", "match_history"]},
-                    "matched_id": {"type": ["string", "null"]},
-                    "confidence": {"type": "number"}
-                },
-                "required": ["id", "status", "matched_id", "confidence"]
-            }
-        }
-    },
-    "required": ["results"]
-}
 
 STREAM_PUBLISH_PREPARATION_PROMPT = """You are a news editor preparing a news item for publication.
 
@@ -310,7 +291,7 @@ When multiple new articles cover the same topic:
 For each new article, return:
 - id: The ID of the new article
 - status: "new", "match_unpublished", or "match_history"
-- matched_id: The ID of the matching item (if status is not "new")
+- matched_id: The ID of the matching item (if status is not "new", otherwise - return null)
 - confidence: Your confidence in this match (0.0 to 1.0)
 
 Return JSON:
@@ -349,3 +330,24 @@ Unpublished news:
 History:
 
 {history}"""
+
+
+BULK_DEDUPLICATION_JSON_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "results": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "string"},
+                    "status": {"type": "string", "enum": ["new", "match_unpublished", "match_history"]},
+                    "matched_id": {"type": "string", "nullable": True},
+                    "confidence": {"type": "number"}
+                },
+                "required": ["id", "status", "matched_id", "confidence"]
+            }
+        }
+    },
+    "required": ["results"]
+}
