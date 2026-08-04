@@ -38,16 +38,12 @@ def bulk_deduplicate_and_match(
         new_articles_text += f"ID: {article.get('id', '')}\n"
         new_articles_text += f"Title: {article.get('title', '')}\n"
         new_articles_text += f"Summary: {article.get('summary', '')}\n"
-        new_articles_text += f"Text: {article.get('text', '')[:500]}...\n"  # Truncate for context
         new_articles_text += "-------------\n"
 
     unpublished_text = ""
     for item in unpublished_news:
         unpublished_text += f"ID: {item.get('id', '')}\n"
         unpublished_text += f"Topic: {item.get('topic_text', '')}\n"
-        original_texts = item.get('original_texts', [])
-        if original_texts:
-            unpublished_text += f"Text: {original_texts[-1][:500]}...\n"
         unpublished_text += "-------------\n"
 
     history_text = ""
