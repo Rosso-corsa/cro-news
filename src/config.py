@@ -23,6 +23,7 @@ _CONFIG_LOADED = False
 def load_config(
     ai_api_key: Optional[str] = None,
     ai_model: Optional[str] = None,
+    ai_model_categorization: Optional[str] = None,
     telegram_bot_token: Optional[str] = None,
     telegram_channel_id: Optional[str] = None,
     telegram_channel_review_id: Optional[str] = None,
@@ -55,6 +56,8 @@ def load_config(
         CONFIG["ai_api_key"] = ai_api_key or os.getenv("AI_API_KEY")
     if ai_model or os.getenv("AI_MODEL"):
         CONFIG["ai_model"] = ai_model or os.getenv("AI_MODEL")
+    if ai_model_categorization or os.getenv("AI_MODEL_CATEGORIZATION"):
+        CONFIG["ai_model_categorization"] = ai_model_categorization or os.getenv("AI_MODEL_CATEGORIZATION")
     if telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN"):
         CONFIG["telegram_bot_token"] = telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
     if telegram_channel_id or os.getenv("TELEGRAM_CHANNEL_ID"):

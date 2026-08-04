@@ -107,7 +107,11 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
 
     logger.info(f"Read {len(articles)} articles from {input_path}")
 
-    # Send articles to Gemini in batches of 50
+    # Get categorization model from config (falls back to default ai_model)
+    config = get_config()
+    categorization_model = config.get('ai_model_categorization') or config.get('ai_model')
+
+    # Send articles to AI in batches of 50
     batch_size = 50
     all_results = []
 
@@ -128,7 +132,7 @@ def categorize_articles(input_path: str = "/tmp/articles.json", output_path: str
 
         prompt = NEWS_ANALYSIS_PROMPT.format(news_data=news_data)
         try:
-            response = get_ai_response(prompt, json_schema=json_schema)
+            response = get_ai_response(prompt, json_schema=json_schema, model=categorization_model)
             result = json.loads(response)
             all_results.extend(result)
             logger.info(f"Batch {(i // batch_size) + 1} completed successfully")
@@ -477,6 +481,9 @@ def stream_process_articles(articles_path: str = "/tmp/stream_articles.json", st
         return
 
     logger.info("Step 1: Categorizing articles with AI")
+    # Get categorization model from config (falls back to default ai_model)
+    config = get_config()
+    categorization_model = config.get('ai_model_categorization') or config.get('ai_model')
     # Prepare news data for the prompt
     news_data = ""
     for article in articles:
@@ -487,7 +494,7 @@ def stream_process_articles(articles_path: str = "/tmp/stream_articles.json", st
 
     prompt = NEWS_ANALYSIS_PROMPT.format(news_data=news_data)
     try:
-        response = get_ai_response(prompt, json_schema=NEWS_ANALYSIS_JSON_SCHEMA)
+        response = get_ai_response(prompt, json_schema=NEWS_ANALYSIS_JSON_SCHEMA, model=categorization_model)
         categorization_results = json.loads(response)
         logger.info(f"Categorization completed for {len(categorization_results)} articles")
 

@@ -30,7 +30,8 @@ _OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 def get_ai_response(
     prompt: str,
-    json_schema: Optional[dict] = None
+    json_schema: Optional[dict] = None,
+    model: Optional[str] = None
 ) -> str:
     """
     Generate a response from an AI provider based on the given prompt.
@@ -43,6 +44,8 @@ def get_ai_response(
         prompt:      The text prompt to send to the AI.
         json_schema: Optional JSON schema for structured output.
                      When provided, the response will conform to this schema.
+        model:       Optional model name to use for this specific call.
+                     If not provided, uses the default ai_model from config.
 
     Returns:
         The AI's response as a string (JSON string when json_schema is provided).
@@ -53,7 +56,7 @@ def get_ai_response(
         Exception:   For non-retriable API errors.
     """
     config_dict = get_config()
-    model_name = config_dict.get('ai_model', 'gemini-2.0-flash-exp')
+    model_name = model or config_dict.get('ai_model', 'gemini-2.0-flash-exp')
     api_key = config_dict.get('ai_api_key', '')
     
     if not api_key:

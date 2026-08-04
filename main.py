@@ -38,6 +38,8 @@ if __name__ == "__main__":
                         help="AI API key (overrides .env)")
     parser.add_argument("--ai-model", type=str, default=None,
                         help="AI model name (overrides .env)")
+    parser.add_argument("--ai-model-categorization", type=str, default=None,
+                        help="AI model name for categorization (overrides .env)")
     parser.add_argument("--telegram-bot-token", type=str, default=None,
                         help="Telegram bot token (overrides .env)")
     parser.add_argument("--telegram-channel-id", type=str, default=None,
@@ -54,6 +56,7 @@ if __name__ == "__main__":
     load_config(
         ai_api_key=args.ai_api_key,
         ai_model=args.ai_model,
+        ai_model_categorization=args.ai_model_categorization,
         telegram_bot_token=args.telegram_bot_token,
         telegram_channel_id=args.telegram_channel_id,
         telegram_channel_review_id=args.telegram_channel_review_id,
