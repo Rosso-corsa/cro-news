@@ -143,9 +143,6 @@ Your task is to prepare a concise, engaging message for publication that:
 You should return:
 1. Catchy headline title (up to 10 words). Must look like a real lifestyle media headline, not a summary.
 2. Summary - description of what happened (3-5 sentences). Don't use sophisticated vocabulary, keep it simple and clear, lifestyle magazine style.
-3. Link to article which describes the topic mostly.
-4. Resolution - publish or not publish (1 - publish, 0 - not publish).
-5. Justification - if cluster resolution is "not publish", provide short explanation why.
 
 All text must be written in Russian. Double check grammar, fix mistakes if found.
 Return JSON:
