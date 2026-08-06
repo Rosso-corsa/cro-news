@@ -6,7 +6,7 @@ Main entry point for the cro-news application.
 import logging
 import argparse
 from src.config import load_config
-from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram, review_channel, stream_collect_articles, stream_process_articles, stream_publish_top
+from src.editor import collect_articles, categorize_articles, group_articles, prepare_digest, publish_article_to_telegram, review_channel, stream_collect_articles, stream_categorize_articles, stream_deduplicate_articles, stream_publish_top
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -22,7 +22,8 @@ def handler(mode: str = "FULL", message_limit: int = 15):
         review_channel(message_limit=message_limit)
     elif mode == "STREAM":
         stream_collect_articles()
-        stream_process_articles()
+        stream_categorize_articles()
+        stream_deduplicate_articles()
         stream_publish_top()
     else:
         raise ValueError(f"Invalid mode: {mode}. Must be 'FULL', 'ONLY_PUBLISH', 'CHANNEL_REVIEW', or 'STREAM'.")

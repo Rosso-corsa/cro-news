@@ -452,35 +452,30 @@ def stream_collect_articles(state_path: str = "/tmp/stream_state.json", articles
 
     write_file(articles, articles_output, force_local=True)
 
-    # Update last_check_time in state
-    state = update_last_check_time(state)
-    write_state(state, state_path)
-
-    logger.info(f"Saved {len(articles)} articles to {articles_output} and updated state")
+    logger.info(f"Saved {len(articles)} articles to {articles_output}")
 
 
-def stream_process_articles(articles_path: str = "/tmp/stream_articles.json", state_path: str = "/tmp/stream_state.json", history_path: str = "/tmp/history.json") -> None:
+def stream_categorize_articles(articles_path: str = "/tmp/stream_articles.json", categorized_path: str = "/tmp/stream_categorized.json") -> None:
     """
-    Process articles for streaming mode: categorize, filter, deduplicate, and update state.
+    Categorize articles for streaming mode: categorize with AI and filter by relevance >= 5.
 
     Args:
         articles_path: Path to the input articles file (default: "/tmp/stream_articles.json")
-        state_path: Path to the state file (default: "/tmp/stream_state.json")
-        history_path: Path to the history file (default: "/tmp/history.json")
+        categorized_path: Path to the output categorized articles file (default: "/tmp/stream_categorized.json")
     """
-    logger.info(f"Starting streaming article processing from {articles_path}")
+    logger.info(f"Starting streaming article categorization from {articles_path}")
 
-    # Read articles and state
+    # Read articles
     articles = read_file(articles_path, force_local=True)
-    state = read_state(state_path)
 
     logger.info(f"Read {len(articles)} articles from {articles_path}")
 
     if not articles:
-        logger.info("No articles to process")
+        logger.info("No articles to categorize")
+        write_file([], categorized_path, force_local=True)
         return
 
-    logger.info("Step 1: Categorizing articles with AI")
+    logger.info("Categorizing articles with AI")
     # Get categorization model from config (falls back to default ai_model)
     config = get_config()
     categorization_model = config.get('ai_model_categorization') or config.get('ai_model')
@@ -510,28 +505,52 @@ def stream_process_articles(articles_path: str = "/tmp/stream_articles.json", st
         logger.error(f"Error during categorization: {e}")
         return
 
-    # Step 2: Filter by fit-level >= 5
-    logger.info("Step 2: Filtering articles by relevance >= 5")
+    # Filter by fit-level >= 5
+    logger.info("Filtering articles by relevance >= 5")
     filtered_articles = [article for article in categorized_articles if article.get('relevance', 0) >= 5]
     logger.info(f"Filtered out {len(categorized_articles) - len(filtered_articles)} articles with relevance < 5. Remaining: {len(filtered_articles)}")
 
+    write_file(filtered_articles, categorized_path, force_local=True)
+    logger.info(f"Saved {len(filtered_articles)} categorized articles to {categorized_path}")
+
+
+def stream_deduplicate_articles(categorized_path: str = "/tmp/stream_categorized.json", state_path: str = "/tmp/stream_state.json", history_path: str = "/tmp/history.json") -> None:
+    """
+    Deduplicate articles for streaming mode: bulk AI deduplication, update state, recalculate publish-meters, update last_check_time.
+
+    Args:
+        categorized_path: Path to the input categorized articles file (default: "/tmp/stream_categorized.json")
+        state_path: Path to the state file (default: "/tmp/stream_state.json")
+        history_path: Path to the history file (default: "/tmp/history.json")
+    """
+    logger.info(f"Starting streaming article deduplication from {categorized_path}")
+
+    # Read categorized articles and state
+    filtered_articles = read_file(categorized_path, force_local=True)
+    state = read_state(state_path)
+
+    logger.info(f"Read {len(filtered_articles)} categorized articles from {categorized_path}")
+
     if not filtered_articles:
-        logger.info("No articles with relevance >= 5")
+        logger.info("No articles to deduplicate")
+        # Still update last_check_time even if no articles
+        state = update_last_check_time(state)
+        write_state(state, state_path)
         return
 
-    # Step 3: Read history (3-day window)
-    logger.info("Step 3: Reading history for deduplication")
+    # Read history (3-day window)
+    logger.info("Reading history for deduplication")
     history = read_history(history_path)
     logger.info(f"Read {len(history)} entries from history")
 
-    # Step 4: Bulk AI deduplication
-    logger.info("Step 4: Performing bulk AI deduplication")
+    # Bulk AI deduplication
+    logger.info("Performing bulk AI deduplication")
     unpublished_news = state.get('unpublished_news', [])
 
     deduplication_results = bulk_deduplicate_and_match(filtered_articles, unpublished_news, history)
 
-    # Step 5: Process AI results
-    logger.info("Step 5: Processing deduplication results")
+    # Process AI results
+    logger.info("Processing deduplication results")
 
     # First pass: create mapping from article_id to unpublished_item_id for "new" articles
     article_to_unpublished_id = {}
@@ -597,15 +616,18 @@ def stream_process_articles(articles_path: str = "/tmp/stream_articles.json", st
         elif result['status'] == 'match_history':
             logger.info(f"Article {article_id} matches history, discarding")
 
-    # Step 6: Recalculate all publish_meters (removing items with time_coef = 0)
-    logger.info("Step 6: Recalculating publish-meters")
+    # Recalculate all publish_meters (removing items with time_coef = 0)
+    logger.info("Recalculating publish-meters")
     unpublished_news = state.get('unpublished_news', [])
     updated_unpublished = recalculate_all_publish_meters(unpublished_news)
     state['unpublished_news'] = updated_unpublished
 
-    # Step 7: Save updated state
+    # Update last_check_time
+    state = update_last_check_time(state)
+
+    # Save updated state
     write_state(state, state_path)
-    logger.info(f"Saved updated state with {len(state['unpublished_news'])} unpublished items")
+    logger.info(f"Saved updated state with {len(state['unpublished_news'])} unpublished items and updated last_check_time")
 
 
 def stream_publish_top(state_path: str = "/tmp/stream_state.json", history_path: str = "/tmp/history.json") -> None:
