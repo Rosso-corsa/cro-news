@@ -23,6 +23,7 @@ _RETRIABLE_ERROR_KEYWORDS = frozenset(["rate limit", "timeout", "network", "temp
 
 _MAX_RETRIES = 5
 _DELAY_BASE = 20.0
+_BACKUP_MODEL_ACTIVE = False
 
 # OpenRouter API endpoint
 _OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -56,17 +57,73 @@ def get_ai_response(
         Exception:   For non-retriable API errors.
     """
     config_dict = get_config()
-    model_name = model or config_dict.get('ai_model', 'gemini-2.0-flash-exp')
+    primary_model = model or config_dict.get('ai_model', 'gemini-2.0-flash-exp')
+    backup_model = (config_dict.get('ai_backup_model') or '').strip()
+    model_name = backup_model if _BACKUP_MODEL_ACTIVE and backup_model else primary_model
     api_key = config_dict.get('ai_api_key', '')
     
     if not api_key:
         raise ValueError("ai_api_key is missing or empty in config")
     
-    # Detect provider based on model name
+    try:
+        return _invoke_model(prompt, json_schema, model_name, api_key)
+    except RuntimeError as exc:
+        if (
+            not _BACKUP_MODEL_ACTIVE
+            and backup_model
+            and backup_model != primary_model
+            and _is_fallback_eligible(exc)
+        ):
+            _activate_backup_model(primary_model, backup_model)
+            return _invoke_model(prompt, json_schema, backup_model, api_key)
+        raise
+
+
+def _invoke_model(
+    prompt: str,
+    json_schema: Optional[dict],
+    model_name: str,
+    api_key: str,
+) -> str:
+    """Invoke the provider selected by the model name."""
     if _is_gemini_model(model_name):
         return _get_gemini_response(prompt, json_schema, model_name, api_key)
-    else:
-        return _get_openrouter_response(prompt, json_schema, model_name, api_key)
+    return _get_openrouter_response(prompt, json_schema, model_name, api_key)
+
+
+def _activate_backup_model(primary_model: str, backup_model: str) -> None:
+    """Switch to the backup model for the remainder of this process."""
+    global _BACKUP_MODEL_ACTIVE
+    _BACKUP_MODEL_ACTIVE = True
+    logger.warning(
+        "Primary AI model '%s' unavailable; switching to backup model '%s' for this run.",
+        primary_model,
+        backup_model,
+    )
+
+
+def _is_fallback_eligible(exc: Exception) -> bool:
+    """Return whether an exhausted provider failure warrants model fallback."""
+    current: Optional[BaseException] = exc
+    while current is not None:
+        status_code = _get_status_code(current)
+        if status_code in {429, 503}:
+            return True
+        current = current.__cause__
+    return False
+
+
+def _get_status_code(exc: BaseException) -> Optional[int]:
+    """Extract an HTTP status code from common provider exception shapes."""
+    response = getattr(exc, "response", None)
+    status_code = getattr(response, "status_code", None)
+    if status_code is not None:
+        return status_code
+    status_code = getattr(exc, "status_code", None)
+    if status_code is not None:
+        return status_code
+    code = getattr(exc, "code", None)
+    return code if isinstance(code, int) else None
 
 
 def _is_gemini_model(model_name: str) -> bool:

@@ -56,6 +56,8 @@ def load_config(
         CONFIG["ai_api_key"] = ai_api_key or os.getenv("AI_API_KEY")
     if ai_model or os.getenv("AI_MODEL"):
         CONFIG["ai_model"] = ai_model or os.getenv("AI_MODEL")
+    if os.getenv("AI_BACKUP_MODEL"):
+        CONFIG["ai_backup_model"] = os.getenv("AI_BACKUP_MODEL")
     if ai_model_categorization or os.getenv("AI_MODEL_CATEGORIZATION"):
         CONFIG["ai_model_categorization"] = ai_model_categorization or os.getenv("AI_MODEL_CATEGORIZATION")
     if telegram_bot_token or os.getenv("TELEGRAM_BOT_TOKEN"):
