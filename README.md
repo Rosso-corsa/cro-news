@@ -36,7 +36,8 @@ Set `AI_MODEL` to the preferred model and optionally set `AI_BACKUP_MODEL` to
 an alternative provider model. After the primary model exhausts its retries
 because of a `429` or `503` response, the application logs a warning and uses
 the backup model for the remainder of the current process run. Both models
-use `AI_API_KEY`.
+use `AI_API_KEY`. GitHub Actions supplies the same value through the
+`AI_BACKUP_MODEL` repository variable and `--ai-backup-model` CLI option.
 
 ## Configuration
 
