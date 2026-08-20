@@ -81,6 +81,5 @@ def bulk_deduplicate_and_match(
         return mapping
 
     except Exception as e:
-        logger.error(f"Error in bulk deduplication: {e}")
-        # Return all as new if AI fails
-        return {article.get('id', ''): {'status': 'new', 'matched_id': None, 'confidence': 0.0} for article in new_articles}
+        logger.error(f"Error in bulk deduplication, the handling will be stopped: {e}")
+        raise e
