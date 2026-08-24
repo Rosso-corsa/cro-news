@@ -19,7 +19,20 @@ logger = logging.getLogger(__name__)
 
 # Retriable HTTP status codes
 _RETRIABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
-_RETRIABLE_ERROR_KEYWORDS = frozenset(["rate limit", "timeout", "network", "temporary", "try again"])
+_RETRIABLE_ERROR_KEYWORDS = frozenset([
+    "rate limit",
+    "timeout",
+    "network",
+    "temporary",
+    "try again",
+    "connection reset",
+    "reset by peer",
+    "readerror",
+    "broken pipe",
+    "connection aborted",
+    "connection refused",
+    "server disconnected",
+])
 
 _MAX_RETRIES = 5
 _DELAY_BASE = 20.0

@@ -12,7 +12,8 @@ from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any
 from dateutil import parser as date_parser
 import feedparser
-from src.config import get_config
+import requests
+from src.config import get_config, load_config
 
 # Configure logging
 logging.basicConfig(
@@ -25,11 +26,17 @@ logger = logging.getLogger(__name__)
 class RSSReader:
     """RSS Feed Reader class for fetching and filtering news items."""
 
-    def __init__(self):
+    def __init__(self, config_path: str = None):
         """
-        Initialize the RSS Reader with global configuration.
+        Initialize the RSS Reader with the project configuration.
         """
-        config = get_config()
+        if config_path is not None:
+            load_config(config_path=config_path)
+        try:
+            config = get_config()
+        except RuntimeError:
+            load_config()
+            config = get_config()
         self.feeds = config.get('rss_feeds', [])
     
     def _is_newer_than_timestamp(self, pub_date: Any, since_timestamp: str = None) -> bool:
@@ -81,7 +88,32 @@ class RSSReader:
             return []
         try:
             logger.info(f"Fetching feed: {feed_name} ({feed_url})")
-            feed = feedparser.parse(feed_url)
+
+            response = requests.get(
+                feed_url,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+                    'Accept': 'application/rss+xml, application/xml, text/xml, */*;q=0.1'
+                },
+                timeout=30,
+            )
+
+            content_type = (response.headers.get('content-type') or '').lower()
+            if response.status_code >= 400:
+                logger.warning(
+                    f"Feed {feed_name} returned HTTP {response.status_code} while fetching {feed_url}; skipping"
+                )
+                return []
+
+            body_sample = (response.text or '')[:500].strip().lower()
+            if 'xml' not in content_type and 'rss' not in content_type and 'atom' not in content_type:
+                if '<html' in body_sample or '<!doctype html' in body_sample or 'cloudflare' in body_sample:
+                    logger.warning(
+                        f"Feed {feed_name} responded with HTML instead of RSS/XML; skipping malformed payload from {feed_url}"
+                    )
+                    return []
+
+            feed = feedparser.parse(response.content)
             if feed.bozo:
                 logger.warning(f"Feed parsing warning for {feed_name}: {feed.bozo_exception}")
 

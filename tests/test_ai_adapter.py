@@ -85,6 +85,18 @@ def test_non_eligible_failure_does_not_switch():
     assert ai_adapter._BACKUP_MODEL_ACTIVE is False
 
 
+@pytest.mark.parametrize(
+    "error_message",
+    [
+        "[Errno 104] Connection reset by peer",
+        "httpx.ReadError: Server disconnected",
+        "[Errno 32] Broken pipe",
+    ],
+)
+def test_transport_errors_are_retriable(error_message):
+    assert ai_adapter._is_retriable(RuntimeError(error_message)) is True
+
+
 def test_missing_or_same_backup_does_not_switch():
     failure = _exhausted_failure(503)
 
