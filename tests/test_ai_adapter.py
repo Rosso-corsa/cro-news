@@ -5,6 +5,7 @@ import logging
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import httpx
 import pytest
 
 from src import ai_adapter
@@ -51,11 +52,30 @@ def test_exhausted_eligible_failure_switches_to_backup(status_code, caplog):
         ai_adapter,
         "_invoke_model",
         side_effect=[failure, "backup response"],
-    ) as invoke, caplog.at_level(logging.WARNING, logger=ai_adapter.__name__):
+    ) as invoke:
         assert ai_adapter.get_ai_response("prompt") == "backup response"
 
     assert ai_adapter._BACKUP_MODEL_ACTIVE is True
     assert "switching to backup model 'backup-model'" in caplog.text
+    assert [call.args[2] for call in invoke.call_args_list] == [
+        "primary-model",
+        "backup-model",
+    ]
+
+
+def test_exhausted_transport_failure_switches_to_backup():
+    provider_error = httpx.ReadError("connection reset by peer")
+    failure = RuntimeError("Gemini API unavailable after 5 attempts")
+    failure.__cause__ = provider_error
+
+    with patch.object(ai_adapter, "get_config", return_value=_config()), patch.object(
+        ai_adapter,
+        "_invoke_model",
+        side_effect=[failure, "backup response"],
+    ) as invoke:
+        assert ai_adapter.get_ai_response("prompt") == "backup response"
+
+    assert ai_adapter._BACKUP_MODEL_ACTIVE is True
     assert [call.args[2] for call in invoke.call_args_list] == [
         "primary-model",
         "backup-model",

@@ -11,6 +11,7 @@ import logging
 import random
 import time
 from typing import Optional
+import httpx
 import requests
 from google import genai
 from src.config import get_config
@@ -122,8 +123,19 @@ def _is_fallback_eligible(exc: Exception) -> bool:
         status_code = _get_status_code(current)
         if status_code in {429, 503}:
             return True
+        if isinstance(current, _TRANSPORT_ERROR_TYPES):
+            return True
         current = current.__cause__
     return False
+
+
+_TRANSPORT_ERROR_TYPES = (
+    httpx.RequestError,
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    ConnectionError,
+    TimeoutError,
+)
 
 
 def _get_status_code(exc: BaseException) -> Optional[int]:
