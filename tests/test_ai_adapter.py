@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import httpx
 import pytest
+import requests
 
 from src import ai_adapter
 
@@ -82,6 +83,41 @@ def test_exhausted_transport_failure_switches_to_backup():
     ]
 
 
+def test_exhausted_timeout_failure_switches_to_backup():
+    failure = RuntimeError("Gemini API unavailable after 5 attempts")
+    failure.__cause__ = TimeoutError()
+
+    with patch.object(ai_adapter, "get_config", return_value=_config()), patch.object(
+        ai_adapter,
+        "_invoke_model",
+        side_effect=[failure, "backup response"],
+    ) as invoke:
+        assert ai_adapter.get_ai_response("prompt") == "backup response"
+
+    assert ai_adapter._BACKUP_MODEL_ACTIVE is True
+    assert [call.args[2] for call in invoke.call_args_list] == [
+        "primary-model",
+        "backup-model",
+    ]
+
+
+def test_gemini_client_uses_three_minute_timeout():
+    response = SimpleNamespace(text="response", usage_metadata=None)
+    client = SimpleNamespace(
+        models=SimpleNamespace(generate_content=lambda **kwargs: response)
+    )
+
+    with patch.object(ai_adapter.genai, "Client", return_value=client) as client_factory:
+        assert ai_adapter._get_gemini_response(
+            "prompt", None, "gemini-test", "test-key"
+        ) == "response"
+
+    client_factory.assert_called_once_with(
+        api_key="test-key",
+        http_options={"timeout": 180_000},
+    )
+
+
 def test_backup_remains_active_for_later_calls():
     ai_adapter._BACKUP_MODEL_ACTIVE = True
 
@@ -106,15 +142,15 @@ def test_non_eligible_failure_does_not_switch():
 
 
 @pytest.mark.parametrize(
-    "error_message",
+    "transport_error",
     [
-        "[Errno 104] Connection reset by peer",
-        "httpx.ReadError: Server disconnected",
-        "[Errno 32] Broken pipe",
+        httpx.ReadError("connection reset by peer"),
+        requests.exceptions.ConnectionError("server disconnected"),
+        TimeoutError(),
     ],
 )
-def test_transport_errors_are_retriable(error_message):
-    assert ai_adapter._is_retriable(RuntimeError(error_message)) is True
+def test_transport_errors_are_retriable(transport_error):
+    assert ai_adapter._is_retriable(transport_error) is True
 
 
 def test_missing_or_same_backup_does_not_switch():

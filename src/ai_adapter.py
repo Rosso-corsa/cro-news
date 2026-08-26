@@ -20,23 +20,10 @@ logger = logging.getLogger(__name__)
 
 # Retriable HTTP status codes
 _RETRIABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
-_RETRIABLE_ERROR_KEYWORDS = frozenset([
-    "rate limit",
-    "timeout",
-    "network",
-    "temporary",
-    "try again",
-    "connection reset",
-    "reset by peer",
-    "readerror",
-    "broken pipe",
-    "connection aborted",
-    "connection refused",
-    "server disconnected",
-])
 
 _MAX_RETRIES = 5
 _DELAY_BASE = 20.0
+_GEMINI_TIMEOUT_MS = 180_000
 _BACKUP_MODEL_ACTIVE = False
 
 # OpenRouter API endpoint
@@ -163,7 +150,10 @@ def _get_gemini_response(
     api_key: str
 ) -> str:
     """Get response from Google Gemini API with retry logic."""
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+        api_key=api_key,
+        http_options={"timeout": _GEMINI_TIMEOUT_MS},
+    )
     config = _build_gemini_config(json_schema)
 
     last_exception: Optional[Exception] = None
@@ -295,19 +285,18 @@ def _build_gemini_config(json_schema: Optional[dict]) -> dict:
 
 def _is_retriable(exc: Exception) -> bool:
     """Return True if the exception represents a transient, retriable failure (Gemini)."""
-    if hasattr(exc, "response") and hasattr(exc.response, "status_code"):
-        return exc.response.status_code in _RETRIABLE_STATUS_CODES
-    error_str = str(exc).lower()
-    return any(kw in error_str for kw in _RETRIABLE_ERROR_KEYWORDS)
+    status_code = _get_status_code(exc)
+    if status_code is not None:
+        return status_code in _RETRIABLE_STATUS_CODES
+    return isinstance(exc, _TRANSPORT_ERROR_TYPES)
 
 
 def _is_retriable_openrouter(exc: Exception) -> bool:
     """Return True if the exception represents a transient, retriable failure (OpenRouter)."""
-    if isinstance(exc, requests.exceptions.RequestException):
-        if hasattr(exc, "response") and exc.response is not None:
-            return exc.response.status_code in _RETRIABLE_STATUS_CODES
-    error_str = str(exc).lower()
-    return any(kw in error_str for kw in _RETRIABLE_ERROR_KEYWORDS)
+    status_code = _get_status_code(exc)
+    if status_code is not None:
+        return status_code in _RETRIABLE_STATUS_CODES
+    return isinstance(exc, _TRANSPORT_ERROR_TYPES)
 
 
 def _raise_if_auth_error(exc: Exception) -> None:
