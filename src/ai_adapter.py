@@ -107,10 +107,7 @@ def _is_fallback_eligible(exc: Exception) -> bool:
     """Return whether an exhausted provider failure warrants model fallback."""
     current: Optional[BaseException] = exc
     while current is not None:
-        status_code = _get_status_code(current)
-        if status_code in {429, 503}:
-            return True
-        if isinstance(current, _TRANSPORT_ERROR_TYPES):
+        if isinstance(current, Exception) and _is_retriable(current):
             return True
         current = current.__cause__
     return False

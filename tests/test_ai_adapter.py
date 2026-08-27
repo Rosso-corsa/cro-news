@@ -45,7 +45,7 @@ def test_primary_success_does_not_activate_backup():
     assert ai_adapter._BACKUP_MODEL_ACTIVE is False
 
 
-@pytest.mark.parametrize("status_code", [429, 503])
+@pytest.mark.parametrize("status_code", sorted(ai_adapter._RETRIABLE_STATUS_CODES))
 def test_exhausted_eligible_failure_switches_to_backup(status_code, caplog):
     failure = _exhausted_failure(status_code)
 
@@ -130,7 +130,7 @@ def test_backup_remains_active_for_later_calls():
 
 
 def test_non_eligible_failure_does_not_switch():
-    failure = _exhausted_failure(500)
+    failure = _exhausted_failure(400)
 
     with patch.object(ai_adapter, "get_config", return_value=_config()), patch.object(
         ai_adapter, "_invoke_model", side_effect=failure
