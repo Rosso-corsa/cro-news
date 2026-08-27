@@ -11,6 +11,7 @@ import logging
 import random
 import time
 from typing import Optional
+import httpx
 import requests
 from google import genai
 from src.config import get_config
@@ -19,10 +20,11 @@ logger = logging.getLogger(__name__)
 
 # Retriable HTTP status codes
 _RETRIABLE_STATUS_CODES = {408, 429, 500, 502, 503, 504}
-_RETRIABLE_ERROR_KEYWORDS = frozenset(["rate limit", "timeout", "network", "temporary", "try again"])
 
 _MAX_RETRIES = 5
 _DELAY_BASE = 20.0
+_GEMINI_TIMEOUT_MS = 180_000
+_BACKUP_MODEL_ACTIVE = False
 
 # OpenRouter API endpoint
 _OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -30,7 +32,8 @@ _OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 def get_ai_response(
     prompt: str,
-    json_schema: Optional[dict] = None
+    json_schema: Optional[dict] = None,
+    model: Optional[str] = None
 ) -> str:
     """
     Generate a response from an AI provider based on the given prompt.
@@ -43,6 +46,8 @@ def get_ai_response(
         prompt:      The text prompt to send to the AI.
         json_schema: Optional JSON schema for structured output.
                      When provided, the response will conform to this schema.
+        model:       Optional model name to use for this specific call.
+                     If not provided, uses the default ai_model from config.
 
     Returns:
         The AI's response as a string (JSON string when json_schema is provided).
@@ -53,17 +58,81 @@ def get_ai_response(
         Exception:   For non-retriable API errors.
     """
     config_dict = get_config()
-    model_name = config_dict.get('ai_model', 'gemini-2.0-flash-exp')
+    primary_model = model or config_dict.get('ai_model', 'gemini-2.0-flash-exp')
+    backup_model = (config_dict.get('ai_backup_model') or '').strip()
+    model_name = backup_model if _BACKUP_MODEL_ACTIVE and backup_model else primary_model
     api_key = config_dict.get('ai_api_key', '')
     
     if not api_key:
         raise ValueError("ai_api_key is missing or empty in config")
     
-    # Detect provider based on model name
+    try:
+        return _invoke_model(prompt, json_schema, model_name, api_key)
+    except RuntimeError as exc:
+        if (
+            not _BACKUP_MODEL_ACTIVE
+            and backup_model
+            and backup_model != primary_model
+            and _is_fallback_eligible(exc)
+        ):
+            _activate_backup_model(primary_model, backup_model)
+            return _invoke_model(prompt, json_schema, backup_model, api_key)
+        raise
+
+
+def _invoke_model(
+    prompt: str,
+    json_schema: Optional[dict],
+    model_name: str,
+    api_key: str,
+) -> str:
+    """Invoke the provider selected by the model name."""
     if _is_gemini_model(model_name):
         return _get_gemini_response(prompt, json_schema, model_name, api_key)
-    else:
-        return _get_openrouter_response(prompt, json_schema, model_name, api_key)
+    return _get_openrouter_response(prompt, json_schema, model_name, api_key)
+
+
+def _activate_backup_model(primary_model: str, backup_model: str) -> None:
+    """Switch to the backup model for the remainder of this process."""
+    global _BACKUP_MODEL_ACTIVE
+    _BACKUP_MODEL_ACTIVE = True
+    logger.warning(
+        "Primary AI model '%s' unavailable; switching to backup model '%s' for this run.",
+        primary_model,
+        backup_model,
+    )
+
+
+def _is_fallback_eligible(exc: Exception) -> bool:
+    """Return whether an exhausted provider failure warrants model fallback."""
+    current: Optional[BaseException] = exc
+    while current is not None:
+        if isinstance(current, Exception) and _is_retriable(current):
+            return True
+        current = current.__cause__
+    return False
+
+
+_TRANSPORT_ERROR_TYPES = (
+    httpx.RequestError,
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    ConnectionError,
+    TimeoutError,
+)
+
+
+def _get_status_code(exc: BaseException) -> Optional[int]:
+    """Extract an HTTP status code from common provider exception shapes."""
+    response = getattr(exc, "response", None)
+    status_code = getattr(response, "status_code", None)
+    if status_code is not None:
+        return status_code
+    status_code = getattr(exc, "status_code", None)
+    if status_code is not None:
+        return status_code
+    code = getattr(exc, "code", None)
+    return code if isinstance(code, int) else None
 
 
 def _is_gemini_model(model_name: str) -> bool:
@@ -78,7 +147,10 @@ def _get_gemini_response(
     api_key: str
 ) -> str:
     """Get response from Google Gemini API with retry logic."""
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+        api_key=api_key,
+        http_options={"timeout": _GEMINI_TIMEOUT_MS},
+    )
     config = _build_gemini_config(json_schema)
 
     last_exception: Optional[Exception] = None
@@ -210,19 +282,18 @@ def _build_gemini_config(json_schema: Optional[dict]) -> dict:
 
 def _is_retriable(exc: Exception) -> bool:
     """Return True if the exception represents a transient, retriable failure (Gemini)."""
-    if hasattr(exc, "response") and hasattr(exc.response, "status_code"):
-        return exc.response.status_code in _RETRIABLE_STATUS_CODES
-    error_str = str(exc).lower()
-    return any(kw in error_str for kw in _RETRIABLE_ERROR_KEYWORDS)
+    status_code = _get_status_code(exc)
+    if status_code is not None:
+        return status_code in _RETRIABLE_STATUS_CODES
+    return isinstance(exc, _TRANSPORT_ERROR_TYPES)
 
 
 def _is_retriable_openrouter(exc: Exception) -> bool:
     """Return True if the exception represents a transient, retriable failure (OpenRouter)."""
-    if isinstance(exc, requests.exceptions.RequestException):
-        if hasattr(exc, "response") and exc.response is not None:
-            return exc.response.status_code in _RETRIABLE_STATUS_CODES
-    error_str = str(exc).lower()
-    return any(kw in error_str for kw in _RETRIABLE_ERROR_KEYWORDS)
+    status_code = _get_status_code(exc)
+    if status_code is not None:
+        return status_code in _RETRIABLE_STATUS_CODES
+    return isinstance(exc, _TRANSPORT_ERROR_TYPES)
 
 
 def _raise_if_auth_error(exc: Exception) -> None:

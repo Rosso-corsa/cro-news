@@ -17,10 +17,6 @@
       "url": "https://www.jutarnji.hr/vijesti/hrvatska/feed"
     },
     {
-      "name": "Vecernji.hr",
-      "url": "https://www.vecernji.hr/feeds/vijesti.xml"
-    },
-    {
       "name": "Dnevnik.hr",
       "url": "https://dnevnik.hr/assets/feed/articles"
     },
@@ -31,6 +27,22 @@
     {
       "name": "ZGPortal (Zgdogadanja)",
       "url": "https://www.zgportal.com/zgdogadanja/feed/"
+    },
+    {
+      "name": "Zagreb.info (Gradska scena)",
+      "url": "https://www.zagreb.info/category/gradska-scena/feed/"
+    },
+    {
+      "name": "Zagreb.info (Vijesti)",
+      "url": "https://www.zagreb.info/category/vijesti/feed/"
+    },
+    {
+      "name": "Zagreb.info (Magazin)",
+      "url": "https://www.zagreb.info/category/magazin/feed/"
+    },
+    {
+      "name": "Telegram HR",
+      "url": "https://www.telegram.hr/feed/"
     }
   ],
   "gemini_api_key": "",

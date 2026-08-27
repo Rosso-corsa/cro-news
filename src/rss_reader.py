@@ -8,11 +8,12 @@ and returns them as Python data structures.
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Any
 from dateutil import parser as date_parser
 import feedparser
-from src.config import get_config
+import requests
+from src.config import get_config, load_config
 
 # Configure logging
 logging.basicConfig(
@@ -25,26 +26,22 @@ logger = logging.getLogger(__name__)
 class RSSReader:
     """RSS Feed Reader class for fetching and filtering news items."""
 
-    def __init__(self):
+    def __init__(self, config_path: str = None):
         """
-        Initialize the RSS Reader with global configuration.
+        Initialize the RSS Reader with the project configuration.
         """
-        config = get_config()
+        if config_path is not None:
+            load_config(config_path=config_path)
+        try:
+            config = get_config()
+        except RuntimeError:
+            load_config()
+            config = get_config()
         self.feeds = config.get('rss_feeds', [])
     
-    def _is_within_last_24_hours(self, pub_date: Any) -> bool:
-        """
-        Check if a publication date is within the last 24 hours.
-        
-        Args:
-            pub_date: Publication date (can be string or datetime object)
-        
-        Returns:
-            True if the date is within the last 24 hours, False otherwise
-        """
+    def _is_newer_than_timestamp(self, pub_date: Any, since_timestamp: str = None) -> bool:
         if not pub_date:
             return False
-        
         try:
             # Parse the date if it's a string
             if isinstance(pub_date, str):
@@ -53,51 +50,80 @@ class RSSReader:
                 parsed_date = pub_date
             else:
                 return False
-            
-            # Make timezone-aware if needed
-            if parsed_date.tzinfo is None:
-                parsed_date = parsed_date.replace(tzinfo=None)
-            
-            # Calculate time difference
-            now = datetime.now(parsed_date.tzinfo) if parsed_date.tzinfo else datetime.now()
-            time_diff = now - parsed_date.replace(tzinfo=None) if parsed_date.tzinfo is None else now - parsed_date
-            
-            return time_diff <= timedelta(hours=24)
+
+            # Normalize to naive UTC
+            if parsed_date.tzinfo is not None:
+                parsed_date = parsed_date.astimezone(timezone.utc).replace(tzinfo=None)
+
+            # Calculate the cutoff time
+            if since_timestamp:
+                cutoff_time = datetime.fromisoformat(since_timestamp)
+                if cutoff_time.tzinfo is not None:
+                    cutoff_time = cutoff_time.astimezone(timezone.utc).replace(tzinfo=None)
+            else:
+                # Default to 24 hours ago (UTC, naive)
+                cutoff_time = datetime.utcnow() - timedelta(hours=24)
+
+            return parsed_date >= cutoff_time
         except Exception as e:
             logger.warning(f"Error parsing date '{pub_date}': {e}")
-            return False
-    
-    def fetch_feed(self, feed_config: Dict[str, str]) -> List[Dict[str, Any]]:
+            return False    
+
+
+    def fetch_feed(self, feed_config: Dict[str, str], since_timestamp: str = None) -> List[Dict[str, Any]]:
         """
         Fetch and parse items from a single RSS feed.
-        
+
         Args:
             feed_config: Dictionary containing 'name' and 'url' of the feed
-        
+            since_timestamp: Optional ISO timestamp to filter items newer than this time
+
         Returns:
-            List of news items from the last 24 hours
+            List of news items from the last 24 hours (or since_timestamp if provided)
         """
         feed_name = feed_config.get('name', 'Unknown')
         feed_url = feed_config.get('url', '')
-        
         if not feed_url:
             logger.warning(f"No URL provided for feed: {feed_name}")
             return []
-        
         try:
             logger.info(f"Fetching feed: {feed_name} ({feed_url})")
-            feed = feedparser.parse(feed_url)
-            
+
+            response = requests.get(
+                feed_url,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+                    'Accept': 'application/rss+xml, application/xml, text/xml, */*;q=0.1'
+                },
+                timeout=30,
+            )
+
+            content_type = (response.headers.get('content-type') or '').lower()
+            if response.status_code >= 400:
+                logger.warning(
+                    f"Feed {feed_name} returned HTTP {response.status_code} while fetching {feed_url}; skipping"
+                )
+                return []
+
+            body_sample = (response.text or '')[:500].strip().lower()
+            if 'xml' not in content_type and 'rss' not in content_type and 'atom' not in content_type:
+                if '<html' in body_sample or '<!doctype html' in body_sample or 'cloudflare' in body_sample:
+                    logger.warning(
+                        f"Feed {feed_name} responded with HTML instead of RSS/XML; skipping malformed payload from {feed_url}"
+                    )
+                    return []
+
+            feed = feedparser.parse(response.content)
             if feed.bozo:
                 logger.warning(f"Feed parsing warning for {feed_name}: {feed.bozo_exception}")
-            
+
             items = []
             for entry in feed.entries:
                 # Extract publication date
                 pub_date = entry.get('published') or entry.get('pubDate') or entry.get('updated')
-                
-                # Filter by last 24 hours
-                if self._is_within_last_24_hours(pub_date):
+
+                # Filter by time
+                if self._is_newer_than_timestamp(pub_date, since_timestamp):
                     item = {
                         'title': entry.get('title', ''),
                         'link': entry.get('link', ''),
@@ -106,40 +132,38 @@ class RSSReader:
                         'source_feed': feed_name
                     }
                     items.append(item)
-            
-            logger.info(f"Found {len(items)} items from {feed_name} in the last 24 hours")
+
+            time_filter_desc = f"since {since_timestamp}" if since_timestamp else "in the last 24 hours"
+            logger.info(f"Found {len(items)} items from {feed_name} {time_filter_desc}")
             return items
-            
+
         except Exception as e:
             logger.error(f"Error fetching feed {feed_name}: {e}")
             return []
     
-    def fetch_all_feeds(self) -> List[Dict[str, Any]]:
-        """
-        Fetch items from all configured RSS feeds.
-        
-        Returns:
-            List of all news items from the last 24 hours across all feeds
-        """
+    def fetch_all_feeds(self, since_timestamp: str = None) -> List[Dict[str, Any]]:
         all_items = []
-        
+
         for feed_config in self.feeds:
-            items = self.fetch_feed(feed_config)
+            items = self.fetch_feed(feed_config, since_timestamp)
             all_items.extend(items)
-        
+
         logger.info(f"Total items fetched from all feeds: {len(all_items)}")
         return all_items
 
 
-def get_recent_news() -> List[Dict[str, Any]]:
+def get_recent_news(since_timestamp: str = None) -> List[Dict[str, Any]]:
     """
     Convenience function to fetch recent news from all configured feeds.
 
+    Args:
+        since_timestamp: Optional ISO timestamp to filter items newer than this time
+
     Returns:
-        List of news items from the last 24 hours
+        List of news items from the last 24 hours (or since_timestamp if provided)
     """
     reader = RSSReader()
-    return reader.fetch_all_feeds()
+    return reader.fetch_all_feeds(since_timestamp)
 
 
 if __name__ == "__main__":
